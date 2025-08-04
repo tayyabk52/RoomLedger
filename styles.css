@@ -1,4 +1,4 @@
-/* RoomLedger - Modern Professional Styles */
+/* RoomLedger - Professional Design System */
 * {
     margin: 0;
     padding: 0;
@@ -6,17 +6,29 @@
 }
 
 :root {
-    /* Modern Color Palette */
-    --primary-50: #eff6ff;
-    --primary-100: #dbeafe;
-    --primary-200: #bfdbfe;
-    --primary-300: #93c5fd;
-    --primary-400: #60a5fa;
-    --primary-500: #3b82f6;
-    --primary-600: #2563eb;
-    --primary-700: #1d4ed8;
-    --primary-800: #1e40af;
-    --primary-900: #1e3a8a;
+    /* Professional Color Palette */
+    --primary-50: #f8fafc;
+    --primary-100: #f1f5f9;
+    --primary-200: #e2e8f0;
+    --primary-300: #cbd5e1;
+    --primary-400: #94a3b8;
+    --primary-500: #64748b;
+    --primary-600: #475569;
+    --primary-700: #334155;
+    --primary-800: #1e293b;
+    --primary-900: #0f172a;
+    
+    /* Accent Colors */
+    --accent-50: #eff6ff;
+    --accent-100: #dbeafe;
+    --accent-200: #bfdbfe;
+    --accent-300: #93c5fd;
+    --accent-400: #60a5fa;
+    --accent-500: #3b82f6;
+    --accent-600: #2563eb;
+    --accent-700: #1d4ed8;
+    --accent-800: #1e40af;
+    --accent-900: #1e3a8a;
     
     /* Neutral Colors */
     --gray-50: #f9fafb;
@@ -33,18 +45,21 @@
     /* Status Colors */
     --success-50: #f0fdf4;
     --success-100: #dcfce7;
+    --success-200: #bbf7d0;
     --success-500: #22c55e;
     --success-600: #16a34a;
     --success-700: #15803d;
     
     --error-50: #fef2f2;
     --error-100: #fee2e2;
+    --error-200: #fecaca;
     --error-500: #ef4444;
     --error-600: #dc2626;
     --error-700: #b91c1c;
     
     --warning-50: #fffbeb;
     --warning-100: #fef3c7;
+    --warning-200: #fde68a;
     --warning-500: #f59e0b;
     --warning-600: #d97706;
     
@@ -84,7 +99,7 @@
 
 body {
     font-family: var(--font-sans);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     min-height: 100vh;
     color: var(--gray-900);
     line-height: 1.6;
@@ -121,7 +136,7 @@ body {
 .header h1 {
     font-size: 3rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent-600) 0%, var(--accent-800) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -144,13 +159,12 @@ body {
 
 /* Card Styles */
 .card {
-    background: rgba(255, 255, 255, 0.95);
+    background: white;
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
     margin-bottom: var(--space-6);
-    box-shadow: var(--shadow-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--gray-100);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -162,13 +176,13 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-500), var(--accent-600));
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2xl);
 }
 
 /* Form Styles */
@@ -206,7 +220,7 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: var(--primary-500);
+    border-color: var(--accent-500);
     box-shadow: var(--shadow-md), 0 0 0 3px rgba(59, 130, 246, 0.1);
     transform: translateY(-1px);
 }
@@ -252,7 +266,7 @@ input::placeholder {
 }
 
 .btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -261,13 +275,13 @@ input::placeholder {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    background: linear-gradient(135deg, var(--accent-600) 0%, var(--accent-700) 100%);
     color: white;
     box-shadow: var(--shadow-md);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-800) 100%);
+    background: linear-gradient(135deg, var(--accent-700) 0%, var(--accent-800) 100%);
 }
 
 .btn-secondary {
@@ -330,7 +344,7 @@ input::placeholder {
 
 .tab-btn.active {
     background: white;
-    color: var(--primary-700);
+    color: var(--accent-700);
     box-shadow: var(--shadow-sm);
 }
 
@@ -370,13 +384,13 @@ input::placeholder {
 .member-chip {
     display: inline-flex;
     align-items: center;
-    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
-    color: var(--primary-700);
+    background: linear-gradient(135deg, var(--accent-50) 0%, var(--accent-100) 100%);
+    color: var(--accent-700);
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-full);
     font-size: 0.875rem;
     font-weight: 600;
-    border: 1px solid var(--primary-200);
+    border: 1px solid var(--accent-200);
     transition: all 0.2s ease;
     animation: slideInLeft 0.3s ease-out;
     position: relative;
@@ -385,7 +399,7 @@ input::placeholder {
 .member-chip:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
-    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%);
+    background: linear-gradient(135deg, var(--accent-100) 0%, var(--accent-200) 100%);
 }
 
 @keyframes slideInLeft {
@@ -456,7 +470,7 @@ input::placeholder {
 .transaction-item:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
-    border-color: var(--primary-200);
+    border-color: var(--accent-200);
 }
 
 /* Settlement Styles */
@@ -567,7 +581,7 @@ input::placeholder {
 }
 
 .arrow {
-    color: var(--primary-500);
+    color: var(--accent-500);
     font-weight: bold;
     font-size: 1.2rem;
 }
@@ -653,7 +667,7 @@ input::placeholder {
     height: 20px;
     border: 2px solid var(--gray-300);
     border-radius: 50%;
-    border-top-color: var(--primary-500);
+    border-top-color: var(--accent-500);
     animation: spin 1s ease-in-out infinite;
 }
 
@@ -683,14 +697,14 @@ input::placeholder {
 
 .checkbox-item:hover {
     background: var(--gray-100);
-    border-color: var(--primary-200);
+    border-color: var(--accent-200);
 }
 
 .checkbox-item input[type="checkbox"] {
     width: 18px;
     height: 18px;
     margin: 0;
-    accent-color: var(--primary-600);
+    accent-color: var(--accent-600);
 }
 
 .checkbox-item label {
@@ -700,6 +714,72 @@ input::placeholder {
     color: var(--gray-700);
     text-transform: none;
     letter-spacing: normal;
+}
+
+/* Member Management Section */
+.member-section {
+    background: var(--gray-50);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+    border: 1px solid var(--gray-200);
+}
+
+.member-section h4 {
+    color: var(--gray-800);
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-500), var(--accent-600));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.member-details {
+    flex: 1;
+}
+
+.member-name {
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--space-1);
+}
+
+.member-role {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.member-role.admin {
+    background: var(--accent-100);
+    color: var(--accent-700);
+}
+
+.member-role.member {
+    background: var(--gray-100);
+    color: var(--gray-600);
 }
 
 /* Responsive Design */
@@ -791,6 +871,10 @@ input::placeholder {
         --gray-700: #e5e7eb;
         --gray-800: #f3f4f6;
         --gray-900: #f9fafb;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     }
     
     .card {

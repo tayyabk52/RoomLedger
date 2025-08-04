@@ -17,7 +17,7 @@
             <p>Smart debt tracking for families & roommates</p>
             <div style="margin-top: var(--space-4); display: flex; justify-content: center; gap: var(--space-2);">
                 <span style="background: var(--success-100); color: var(--success-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">✨ Smart Settlement</span>
-                <span style="background: var(--primary-100); color: var(--primary-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">👥 Group Management</span>
+                <span style="background: var(--accent-100); color: var(--accent-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">👥 Group Management</span>
                 <span style="background: var(--warning-100); color: var(--warning-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">📱 Mobile Friendly</span>
             </div>
         </div>
@@ -47,28 +47,65 @@
             <!-- Register Tab -->
             <div id="registerTab" class="tab-content">
                 <h3 style="margin-bottom: 20px;">Create New Group</h3>
-                <div class="form-group">
-                    <label>Your Name (Group Admin)</label>
-                    <input type="text" id="adminName" placeholder="Enter your name">
+                
+                <!-- Step 1: Admin Info -->
+                <div class="member-section">
+                    <h4>👤 Step 1: Your Information</h4>
+                    <div class="form-group">
+                        <label>Your Name (Group Admin)</label>
+                        <input type="text" id="adminName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Group Password</label>
+                        <input type="password" id="groupPassword" placeholder="Create a secure password for your group">
+                        <small style="color: var(--gray-500); margin-top: var(--space-2); display: block;">
+                            🔒 This password will be shared with all group members
+                        </small>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Group Password</label>
-                    <input type="password" id="groupPassword" placeholder="Create a password for your group">
-                </div>
-                <div class="form-group">
-                    <label>Add Group Members</label>
+                
+                <!-- Step 2: Add Members -->
+                <div class="member-section">
+                    <h4>👥 Step 2: Add Group Members</h4>
+                    <p style="color: var(--gray-600); margin-bottom: var(--space-4); font-size: 0.875rem;">
+                        Add the names of people who will be sharing expenses. You can add more members later.
+                    </p>
+                    <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
+                        <span style="background: var(--accent-100); color: var(--accent-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.875rem; font-weight: 600;">
+                            <span class="member-count">1 member</span>
+                        </span>
+                        <span style="color: var(--gray-500); font-size: 0.875rem;">(including you)</span>
+                    </div>
+                    
                     <div class="member-input-group">
                         <div class="form-group">
                             <input type="text" id="memberName" placeholder="Enter member name" onkeypress="handleMemberKeyPress(event)">
                         </div>
-                        <button class="btn btn-secondary" onclick="addMember()">Add</button>
+                        <button class="btn btn-secondary" onclick="addMember()">Add Member</button>
                     </div>
+                    
                     <div id="membersList" class="member-list"></div>
-                    <small style="color: var(--gray-500); margin-top: var(--space-2); display: block;">
-                        💡 Tip: Press Enter to quickly add members
-                    </small>
+                    
+                    <div style="margin-top: var(--space-4); padding: var(--space-3); background: var(--accent-50); border-radius: var(--radius-lg); border: 1px solid var(--accent-200);">
+                        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                            <span style="font-size: 1.2rem;">💡</span>
+                            <strong style="color: var(--accent-700);">Quick Tips:</strong>
+                        </div>
+                        <ul style="color: var(--accent-600); font-size: 0.875rem; margin: 0; padding-left: var(--space-4);">
+                            <li>Press <strong>Enter</strong> to quickly add members</li>
+                            <li>Add at least 2-3 members for better expense tracking</li>
+                            <li>You can add more members after creating the group</li>
+                        </ul>
+                    </div>
                 </div>
-                <button class="btn btn-primary" onclick="createGroup()">Create Group</button>
+                
+                <!-- Step 3: Create Group -->
+                <div style="text-align: center; margin-top: var(--space-6);">
+                    <button class="btn btn-primary" onclick="createGroup()" style="padding: var(--space-4) var(--space-8); font-size: 1rem;">
+                        🚀 Create Group & Start Tracking
+                    </button>
+                </div>
+                
                 <div id="registerError" class="error"></div>
             </div>
         </div>
@@ -134,8 +171,11 @@
                     <h3 style="margin-bottom: 20px;">Manage Group Members</h3>
                     
                     <!-- Add New Member Section -->
-                    <div class="card" style="margin-bottom: var(--space-6);">
-                        <h4 style="margin-bottom: var(--space-4); color: var(--gray-700);">➕ Add New Member</h4>
+                    <div class="member-section">
+                        <h4>➕ Add New Member</h4>
+                        <p style="color: var(--gray-600); margin-bottom: var(--space-4); font-size: 0.875rem;">
+                            Invite new members to join your expense tracking group.
+                        </p>
                         <div class="member-input-group">
                             <div class="form-group">
                                 <input type="text" id="newMemberName" placeholder="Enter member name">
@@ -147,8 +187,11 @@
                     </div>
                     
                     <!-- Current Members Section -->
-                    <div class="card">
-                        <h4 style="margin-bottom: var(--space-4); color: var(--gray-700);">👥 Current Members</h4>
+                    <div class="member-section">
+                        <h4>👥 Current Members</h4>
+                        <p style="color: var(--gray-600); margin-bottom: var(--space-4); font-size: 0.875rem;">
+                            Manage existing group members. Only admins can remove members.
+                        </p>
                         <div id="currentMembers"></div>
                     </div>
                 </div>
@@ -228,7 +271,12 @@
             // Show success feedback
             const successFeedback = document.createElement('div');
             successFeedback.className = 'success';
-            successFeedback.textContent = `✅ Added ${memberName} to the group`;
+            successFeedback.innerHTML = `
+                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                    <span>✅</span>
+                    <span><strong>${memberName}</strong> added to the group</span>
+                </div>
+            `;
             successFeedback.style.marginTop = 'var(--space-2)';
             document.getElementById('membersList').appendChild(successFeedback);
             
@@ -236,6 +284,17 @@
             setTimeout(() => {
                 successFeedback.remove();
             }, 3000);
+            
+            // Update the member count display
+            updateMemberCount();
+        }
+        
+        function updateMemberCount() {
+            const totalMembers = pendingMembers.length + 1; // +1 for admin
+            const countDisplay = document.querySelector('.member-count');
+            if (countDisplay) {
+                countDisplay.textContent = `${totalMembers} member${totalMembers !== 1 ? 's' : ''}`;
+            }
         }
 
         function removeMember(name) {
@@ -781,21 +840,20 @@
             const membersHtml = groupMembers.map(member => {
                 const canRemove = currentUser.is_admin && member.id !== currentUser.id;
                 const isCurrentUser = member.id === currentUser.id;
-                const roleBadge = member.is_admin ? 
-                    '<span style="background: var(--primary-100); color: var(--primary-700); padding: 2px 8px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">Admin</span>' : 
-                    '<span style="background: var(--gray-100); color: var(--gray-600); padding: 2px 8px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">Member</span>';
+                const roleClass = member.is_admin ? 'admin' : 'member';
+                const roleText = member.is_admin ? 'Admin' : 'Member';
                 
                 return `<div class="transaction-item">
-                    <div style="display: flex; align-items: center; gap: var(--space-3);">
-                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                    <div class="member-info">
+                        <div class="member-avatar">
                             ${member.username.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                            <div style="font-weight: 600; color: var(--gray-900);">
+                        <div class="member-details">
+                            <div class="member-name">
                                 ${member.username} ${isCurrentUser ? '(You)' : ''}
                             </div>
-                            <div style="display: flex; gap: var(--space-2); margin-top: var(--space-1);">
-                                ${roleBadge}
+                            <div class="member-role ${roleClass}">
+                                ${roleText}
                             </div>
                         </div>
                     </div>

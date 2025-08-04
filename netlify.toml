@@ -8,11 +8,12 @@
 # Environment variables are set in Netlify UI
 # Functions configuration
 [functions]
-  # Python runtime for serverless functions
-  runtime = "python3.9"
-  
   # Function timeout
   timeout = 30
+
+[functions.runtime]
+  # Python runtime for serverless functions
+  runtime = "python3.9"
 
 # Redirect settings for SPA
 [[redirects]]

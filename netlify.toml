@@ -8,8 +8,6 @@
 # Environment variables are set in Netlify UI
 # Functions configuration
 [functions]
-  # Function timeout
-  timeout = 30
 
 [functions.runtime]
   # Python runtime for serverless functions

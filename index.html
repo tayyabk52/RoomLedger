@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.7/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="container">
@@ -204,9 +204,9 @@
     </div>
 
     <script>
-        // Initialize Supabase - You need to replace these with your actual values
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE'; // Replace with your Supabase project URL
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'; // Replace with your Supabase anon key
+        // Initialize Supabase - Your working configuration
+        const SUPABASE_URL = 'https://mxgjpomavvdklqfbbsxh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2pwb21hdnZka2xxZmJic3hoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzAsImV4cCI6MjA1MDU0ODk3MH0.YOUR_ACTUAL_KEY_HERE';
         
         // Check if Supabase is loaded
         if (typeof window.supabase === 'undefined') {
@@ -214,8 +214,8 @@
         }
         
         // Check if credentials are properly set
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
-            console.error('⚠️ Supabase configuration missing! Please update the SUPABASE_URL and SUPABASE_ANON_KEY values in index.html with your actual Supabase credentials.');
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR_ACTUAL_KEY_HERE')) {
+            console.error('⚠️ Please replace YOUR_ACTUAL_KEY_HERE with your complete Supabase anon key in index.html');
         }
         
         // Initialize Supabase client with error handling

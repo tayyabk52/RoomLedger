@@ -184,7 +184,11 @@
                 </div>
                 
                 <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="showTab('addDebt')">
+                    <button class="tab-btn active" onclick="showTab('dashboard')">
+                        <span>📊</span>
+                        Dashboard
+                    </button>
+                    <button class="tab-btn" onclick="showTab('addDebt')">
                         <span>➕</span>
                         Add Expense
                     </button>
@@ -202,8 +206,84 @@
                     </button>
                 </div>
 
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content active">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📊</span>
+                            Dashboard Overview
+                        </div>
+                        <div class="card-subtitle">Quick overview of your group's financial status</div>
+                    </div>
+                    
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-value" id="totalExpenses">PKR 0</div>
+                            <div class="stat-label">Total Expenses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value" id="memberCount">0</div>
+                            <div class="stat-label">Group Members</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-value" id="pendingSettlements">0</div>
+                            <div class="stat-label">Pending Settlements</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-value" id="completedSettlements">0</div>
+                            <div class="stat-label">Completed Settlements</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="showTab('addDebt')">
+                                <span>➕</span>
+                                Add New Expense
+                            </button>
+                            <button class="btn btn-secondary" onclick="showTab('settle')">
+                                <span>💰</span>
+                                View Settlements
+                            </button>
+                            <button class="btn btn-secondary" onclick="showTab('history')">
+                                <span>📜</span>
+                                View History
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div id="recentActivityList" class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">📊</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Dashboard loaded</div>
+                                    <div class="activity-time">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Balances Preview -->
+                    <div class="balances-preview">
+                        <h3>Current Balances</h3>
+                        <div id="balancesPreview" class="balances-list">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Add Debt Tab -->
-                <div id="addDebtTab" class="tab-content active">
+                <div id="addDebtTab" class="tab-content">
                     <div class="card-header">
                         <div class="card-title">
                             <span>➕</span>
@@ -220,6 +300,37 @@
                         </div>
                         
                         <div class="form-group">
+                            <label>Category</label>
+                            <div class="category-selector">
+                                <div class="category-option" data-category="food">
+                                    <span class="category-icon">🍕</span>
+                                    <span class="category-name">Food & Dining</span>
+                                </div>
+                                <div class="category-option" data-category="transport">
+                                    <span class="category-icon">🚗</span>
+                                    <span class="category-name">Transport</span>
+                                </div>
+                                <div class="category-option" data-category="utilities">
+                                    <span class="category-icon">⚡</span>
+                                    <span class="category-name">Utilities</span>
+                                </div>
+                                <div class="category-option" data-category="entertainment">
+                                    <span class="category-icon">🎬</span>
+                                    <span class="category-name">Entertainment</span>
+                                </div>
+                                <div class="category-option" data-category="shopping">
+                                    <span class="category-icon">🛒</span>
+                                    <span class="category-name">Shopping</span>
+                                </div>
+                                <div class="category-option" data-category="other">
+                                    <span class="category-icon">📦</span>
+                                    <span class="category-name">Other</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="expenseCategory" value="food">
+                        </div>
+                        
+                        <div class="form-group">
                             <label>Who Paid?</label>
                             <select id="whoPaid"></select>
                             <small class="form-hint">Select who covered this expense</small>
@@ -227,7 +338,10 @@
                         
                         <div class="form-group">
                             <label>Amount (PKR)</label>
-                            <input type="number" id="debtAmount" placeholder="Enter amount" step="0.01" min="0">
+                            <div class="amount-input">
+                                <input type="number" id="debtAmount" placeholder="Enter amount" step="0.01" min="0">
+                                <div class="currency-symbol">PKR</div>
+                            </div>
                             <small class="form-hint">Total amount that was paid</small>
                         </div>
                         
@@ -235,6 +349,18 @@
                             <label>Split Between</label>
                             <div class="split-description">Select all members who should contribute to this expense</div>
                             <div id="splitBetween" class="checkbox-group"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Payment Method (Optional)</label>
+                            <select id="paymentMethod">
+                                <option value="">Select payment method</option>
+                                <option value="cash">Cash</option>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="mobile">Mobile Payment</option>
+                            </select>
+                            <small class="form-hint">How was this expense paid?</small>
                         </div>
                         
                         <button class="btn btn-primary btn-large" onclick="addDebt()">
@@ -638,9 +764,13 @@
             document.getElementById('welcomeMessage').textContent = `Welcome, ${currentUser.username}!`;
             
             updateDropdowns();
+            loadDashboard();
             loadCurrentBalances();
             loadHistory();
             updateManageTab();
+            
+            // Initialize category selector
+            initializeCategorySelector();
         }
 
         // Main app functions
@@ -648,13 +778,15 @@
             document.querySelectorAll('#appSection .tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('#appSection .tab-content').forEach(content => content.classList.remove('active'));
             
-            const tabs = ['addDebt', 'settle', 'history', 'manage'];
+            const tabs = ['dashboard', 'addDebt', 'settle', 'history', 'manage'];
             const index = tabs.indexOf(tab);
             
             document.querySelectorAll('#appSection .tab-btn')[index].classList.add('active');
             document.getElementById(tab + 'Tab').classList.add('active');
             
-            if (tab === 'settle') {
+            if (tab === 'dashboard') {
+                loadDashboard();
+            } else if (tab === 'settle') {
                 loadCurrentBalances();
             } else if (tab === 'history') {
                 loadHistory();
@@ -681,11 +813,177 @@
             ).join('');
         }
 
+        // Dashboard functions
+        async function loadDashboard() {
+            try {
+                // Load statistics
+                await loadDashboardStats();
+                await loadRecentActivity();
+                await loadBalancesPreview();
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        async function loadDashboardStats() {
+            try {
+                // Get total expenses
+                const { data: expenses, error: expensesError } = await supabase
+                    .from('transactions')
+                    .select('amount')
+                    .eq('group_id', currentGroup.id);
+                
+                if (expensesError) throw expensesError;
+                
+                const totalExpenses = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+                document.getElementById('totalExpenses').textContent = `PKR ${totalExpenses.toFixed(2)}`;
+                
+                // Get member count
+                document.getElementById('memberCount').textContent = groupMembers.length;
+                
+                // Get settlement counts (placeholder for now)
+                document.getElementById('pendingSettlements').textContent = '0';
+                document.getElementById('completedSettlements').textContent = '0';
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+        
+        async function loadRecentActivity() {
+            try {
+                const { data: transactions, error } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('group_id', currentGroup.id)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (error) throw error;
+                
+                const activityList = document.getElementById('recentActivityList');
+                activityList.innerHTML = '';
+                
+                if (transactions.length === 0) {
+                    activityList.innerHTML = '<div class="activity-item"><div class="activity-content"><div class="activity-title">No recent activity</div></div></div>';
+                    return;
+                }
+                
+                transactions.forEach(transaction => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.innerHTML = `
+                        <div class="activity-icon">💰</div>
+                        <div class="activity-content">
+                            <div class="activity-title">${transaction.description}</div>
+                            <div class="activity-time">${new Date(transaction.created_at).toLocaleDateString()}</div>
+                        </div>
+                    `;
+                    activityList.appendChild(activityItem);
+                });
+                
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+        
+        async function loadBalancesPreview() {
+            try {
+                const balances = await calculateBalances();
+                const balancesPreview = document.getElementById('balancesPreview');
+                balancesPreview.innerHTML = '';
+                
+                if (balances.length === 0) {
+                    balancesPreview.innerHTML = '<div class="message info">Everyone is settled up!</div>';
+                    return;
+                }
+                
+                balances.slice(0, 3).forEach(balance => {
+                    const balanceItem = document.createElement('div');
+                    balanceItem.className = 'debt-item';
+                    balanceItem.innerHTML = `
+                        <div class="debt-name">${balance.name}</div>
+                        <div class="debt-amount ${balance.amount >= 0 ? 'positive' : 'negative'}">
+                            ${balance.amount >= 0 ? '+' : ''}PKR ${balance.amount.toFixed(2)}
+                        </div>
+                    `;
+                    balancesPreview.appendChild(balanceItem);
+                });
+                
+                if (balances.length > 3) {
+                    const moreItem = document.createElement('div');
+                    moreItem.className = 'message info';
+                    moreItem.textContent = `And ${balances.length - 3} more...`;
+                    balancesPreview.appendChild(moreItem);
+                }
+                
+            } catch (error) {
+                console.error('Error loading balances preview:', error);
+            }
+        }
+        
+        // Category selector functions
+        function initializeCategorySelector() {
+            const categoryOptions = document.querySelectorAll('.category-option');
+            const categoryInput = document.getElementById('expenseCategory');
+            
+            categoryOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    categoryOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    option.classList.add('selected');
+                    
+                    // Update hidden input
+                    categoryInput.value = option.dataset.category;
+                });
+            });
+            
+            // Set default selected category
+            document.querySelector('[data-category="food"]').classList.add('selected');
+        }
+        
+        // Helper function to calculate balances
+        async function calculateBalances() {
+            try {
+                const { data: transactions, error } = await supabase
+                    .from('transactions')
+                    .select(`
+                        *,
+                        from_member:group_members!from_member_id(username),
+                        to_member:group_members!to_member_id(username)
+                    `)
+                    .eq('group_id', currentGroup.id)
+                    .eq('settled', false);
+
+                if (error) throw error;
+
+                // Calculate net balances
+                const balances = {};
+                groupMembers.forEach(member => {
+                    balances[member.id] = { name: member.username, amount: 0 };
+                });
+
+                transactions.forEach(transaction => {
+                    balances[transaction.from_member_id].amount -= transaction.amount;
+                    balances[transaction.to_member_id].amount += transaction.amount;
+                });
+
+                return Object.values(balances).filter(person => Math.abs(person.amount) > 0.01);
+            } catch (error) {
+                console.error('Error calculating balances:', error);
+                return [];
+            }
+        }
+        
         async function addDebt() {
             const description = document.getElementById('debtDescription').value.trim();
             const whoPaid = document.getElementById('whoPaid').value;
             const amount = parseFloat(document.getElementById('debtAmount').value);
             const splitBetween = Array.from(document.querySelectorAll('#splitBetween input:checked')).map(cb => parseInt(cb.value));
+            const category = document.getElementById('expenseCategory').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
             
             const errorDiv = document.getElementById('debtError');
             const successDiv = document.getElementById('debtSuccess');
@@ -694,7 +992,7 @@
             successDiv.textContent = '';
 
             if (!description || !amount || splitBetween.length === 0) {
-                errorDiv.textContent = 'Please fill in all fields and select at least one person to split between';
+                errorDiv.textContent = 'Please fill in all required fields and select at least one person to split between';
                 return;
             }
 

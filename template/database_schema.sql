@@ -192,7 +192,7 @@ CREATE INDEX idx_group_members_active ON group_members(group_id, is_active);
 CREATE INDEX idx_transactions_group_id ON transactions(group_id);
 CREATE INDEX idx_transactions_settled ON transactions(group_id, settled);
 CREATE INDEX idx_transactions_date ON transactions(transaction_date DESC);
-CREATE INDEX idx_transactions_member FROM transactions(from_member_id);
+CREATE INDEX idx_transactions_member ON transactions(from_member_id);
 CREATE INDEX idx_transactions_member_to ON transactions(to_member_id);
 CREATE INDEX idx_transactions_category ON transactions(category_id);
 

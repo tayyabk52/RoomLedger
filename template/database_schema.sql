@@ -216,12 +216,12 @@ CREATE INDEX idx_invites_group ON group_invites(group_id);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$ language 'plpgsql';
+$$ language 'plpgsql';
 
 -- Create triggers for updated_at
 CREATE TRIGGER update_groups_updated_at BEFORE UPDATE ON groups 
@@ -249,7 +249,7 @@ INSERT INTO expense_categories (group_id, name, description, color, icon, is_def
 
 -- Create function to automatically create default categories for new groups
 CREATE OR REPLACE FUNCTION create_default_categories_for_group()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO expense_categories (group_id, name, description, color, icon, is_default)
     SELECT NEW.id, name, description, color, icon, false
@@ -258,7 +258,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Create trigger to auto-create categories for new groups
 CREATE TRIGGER create_default_categories_trigger
@@ -268,7 +268,7 @@ CREATE TRIGGER create_default_categories_trigger
 
 -- Create function for audit logging
 CREATE OR REPLACE FUNCTION audit_trigger_function()
-RETURNS TRIGGER AS $
+RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
         INSERT INTO audit_log (group_id, member_id, action, entity_type, entity_id, new_data)
@@ -287,7 +287,7 @@ BEGIN
         RETURN NEW;
     END IF;
 END;
-$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 -- Create audit triggers for key tables
 CREATE TRIGGER audit_transactions_trigger

@@ -19,12 +19,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/roomledger.git"
+    "url": "https://github.com/tayyabk52/RoomLedger.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/roomledger/issues"
+    "url": "https://github.com/tayyabk52/RoomLedger/issues"
   },
-  "homepage": "https://github.com/yourusername/roomledger#readme",
+  "homepage": "https://github.com/tayyabk52/RoomLedger#readme",
   "devDependencies": {},
   "dependencies": {}
 } 

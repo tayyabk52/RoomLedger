@@ -155,12 +155,34 @@
 
                 <!-- Settle Tab -->
                 <div id="settleTab" class="tab-content">
-                    <h3 style="margin-bottom: 20px;">Current Balances & Smart Settlement</h3>
-                    <div id="currentBalances"></div>
-                    <button class="btn btn-primary" onclick="calculateSettlement()">Calculate Smart Settlement</button>
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>💰</span>
+                            Current Balances & Smart Settlement
+                        </div>
+                        <div class="card-subtitle">See who owes what to whom and settle efficiently</div>
+                    </div>
+                    
+                    <!-- Enhanced Debt Summary -->
+                    <div class="debt-summary">
+                        <div class="debt-summary-header">
+                            <div class="debt-summary-title">Group Overview</div>
+                            <div class="debt-summary-amount" id="totalDebtAmount">PKR 0.00</div>
+                        </div>
+                        <div class="debt-breakdown" id="currentBalances"></div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="calculateSettlement()">
+                        <span>🧮</span>
+                        Calculate Smart Settlement
+                    </button>
+                    
                     <div id="settlementResult"></div>
                     <div id="settleActions" class="hidden" style="margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="executeSettlement()">Confirm & Record Settlement</button>
+                        <button class="btn btn-success" onclick="executeSettlement()">
+                            <span>✅</span>
+                            Confirm & Record Settlement
+                        </button>
                     </div>
                 </div>
 
@@ -624,25 +646,39 @@
                     balances[transaction.to_member_id].balance += transaction.amount;
                 });
 
-                // Display balances
-                const balancesDiv = document.getElementById('currentBalances');
-                const balanceItems = Object.values(balances)
-                    .filter(person => Math.abs(person.balance) > 0.01)
-                    .map(person => {
-                        const isPositive = person.balance > 0;
-                        const color = isPositive ? '#38a169' : '#e53e3e';
-                        const text = isPositive ? 'is owed' : 'owes';
-                        return `<div class="transaction-item">
-                            <strong>${person.name}</strong> ${text} 
-                            <span style="color: ${color};">PKR ${Math.abs(person.balance).toFixed(2)}</span>
-                        </div>`;
-                    });
-
-                if (balanceItems.length === 0) {
-                    balancesDiv.innerHTML = '<div class="transaction-item">✅ Everyone is settled up!</div>';
-                } else {
-                    balancesDiv.innerHTML = balanceItems.join('');
-                }
+                                   // Display enhanced balances
+                   const balancesDiv = document.getElementById('currentBalances');
+                   const totalDebtAmount = document.getElementById('totalDebtAmount');
+                   
+                   const balanceItems = Object.values(balances)
+                       .filter(person => Math.abs(person.balance) > 0.01)
+                       .map(person => {
+                           const isPositive = person.balance > 0;
+                           const status = isPositive ? 'owed-to' : 'owed';
+                           const text = isPositive ? 'is owed' : 'owes';
+                           return `<div class="debt-item">
+                               <div class="debt-item-header">
+                                   <div class="debt-person">${person.name}</div>
+                                   <div class="debt-status ${status}">${text}</div>
+                               </div>
+                               <div class="debt-amount ${isPositive ? 'positive' : 'negative'}">
+                                   PKR ${Math.abs(person.balance).toFixed(2)}
+                               </div>
+                           </div>`;
+                       });
+   
+                   // Calculate total debt amount
+                   const totalAmount = Object.values(balances)
+                       .filter(person => person.balance < 0)
+                       .reduce((sum, person) => sum + Math.abs(person.balance), 0);
+                   
+                   totalDebtAmount.textContent = `PKR ${totalAmount.toFixed(2)}`;
+   
+                                       if (balanceItems.length === 0) {
+                        balancesDiv.innerHTML = '<div class="debt-item" style="text-align: center; padding: var(--space-8);"><div style="font-size: 3rem; margin-bottom: var(--space-4);">✅</div><div style="font-weight: 600; color: var(--apple-green);">Everyone is settled up!</div><div style="color: var(--label-secondary); margin-top: var(--space-2);">No outstanding debts</div></div>';
+                    } else {
+                        balancesDiv.innerHTML = balanceItems.join('');
+                    }
 
             } catch (error) {
                 console.error('Error loading balances:', error);
@@ -755,53 +791,52 @@
             const actionsDiv = document.getElementById('settleActions');
 
             if (settlements.length === 0) {
-                resultDiv.innerHTML = '<div class="settlement-result no-settlements">✅ Everyone is already settled up!</div>';
+                resultDiv.innerHTML = '<div class="settlement-card" style="text-align: center; padding: var(--space-8);"><div style="font-size: 3rem; margin-bottom: var(--space-4);">✅</div><div style="font-weight: 600; color: var(--apple-green);">Everyone is already settled up!</div><div style="color: var(--label-secondary); margin-top: var(--space-2);">No payments needed</div></div>';
                 actionsDiv.classList.add('hidden');
             } else {
                 let optimizationText = '';
                 if (optimizationInfo) {
                     optimizationText = `
-                        <div class="optimization-info">
-                            <div class="optimization-stat">
-                                <span class="stat-label">Algorithm Used:</span>
-                                <span class="stat-value">${optimizationInfo.algorithm}</span>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">${optimizationInfo.algorithm}</div>
+                                <div class="stat-label">Algorithm Used</div>
                             </div>
-                            <div class="optimization-stat">
-                                <span class="stat-label">Optimization Time:</span>
-                                <span class="stat-value">${optimizationInfo.computation_time}ms</span>
+                            <div class="stat-card">
+                                <div class="stat-value">${optimizationInfo.computation_time}ms</div>
+                                <div class="stat-label">Optimization Time</div>
                             </div>
-                            <div class="optimization-stat">
-                                <span class="stat-label">Efficiency Gain:</span>
-                                <span class="stat-value">${optimizationInfo.efficiency_percentage}%</span>
+                            <div class="stat-card">
+                                <div class="stat-value">${optimizationInfo.efficiency_percentage}%</div>
+                                <div class="stat-label">Efficiency Gain</div>
                             </div>
                         </div>
                     `;
                 }
 
+                const totalAmount = settlements.reduce((sum, s) => sum + s.amount, 0);
                 const settlementHtml = `
-                    <div class="settlement-result">
+                    <div class="settlement-card">
                         <div class="settlement-header">
-                            <h4>💡 Smart Settlement Plan</h4>
-                            <p>Optimized to minimize transactions</p>
+                            <div class="settlement-title">🧮 Smart Settlement Calculated!</div>
+                            <div class="settlement-amount">PKR ${totalAmount.toFixed(2)}</div>
+                        </div>
+                        <div style="color: var(--label-secondary); margin-bottom: var(--space-4);">
+                            Follow these steps to settle up with minimum transactions:
                         </div>
                         ${optimizationText}
-                        <div class="settlement-summary">
-                            <div class="summary-item">
-                                <span class="summary-label">Required Payments:</span>
-                                <span class="summary-value">${settlements.length}</span>
-                            </div>
-                        </div>
-                        <div class="settlement-list">
-                            ${settlements.map(settlement => 
-                                `<div class="settlement-item">
-                                    <div class="settlement-flow">
-                                        <span class="payer">${settlement.fromName}</span>
-                                        <span class="arrow">→</span>
-                                        <span class="payee">${settlement.toName}</span>
+                        <div class="settlement-steps">
+                            ${settlements.map((s, index) => `
+                                <div class="settlement-step">
+                                    <div class="step-number">${index + 1}</div>
+                                    <div class="step-details">
+                                        <span class="step-from">${s.fromName}</span>
+                                        <span> pays </span>
+                                        <span class="step-to">${s.toName}</span>
+                                        <span class="step-amount"> PKR ${s.amount.toFixed(2)}</span>
                                     </div>
-                                    <span class="amount">₹${settlement.amount.toFixed(2)}</span>
-                                </div>`
-                            ).join('')}
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;

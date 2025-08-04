@@ -201,8 +201,8 @@
 
     <script>
         // Initialize Supabase with environment variables
-        const SUPABASE_URL = window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
-        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
+        const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
         
         // Check if Supabase is loaded
         if (typeof window.supabase === 'undefined') {
@@ -222,7 +222,7 @@
             console.error('Failed to initialize Supabase client:', error);
         }
 
-        // Global variables
+        // Global variables - Initialize immediately
         let currentUser = null;
         let currentGroup = null;
         let groupMembers = [];
@@ -250,9 +250,6 @@
         }
 
         function addMember() {
-            if (typeof pendingMembers === 'undefined') {
-                pendingMembers = [];
-            }
             const memberName = document.getElementById('memberName').value.trim();
             const errorDiv = document.getElementById('registerError');
             
@@ -305,9 +302,6 @@
         }
         
         function updateMemberCount() {
-            if (typeof pendingMembers === 'undefined') {
-                pendingMembers = [];
-            }
             const totalMembers = pendingMembers.length + 1; // +1 for admin
             const countDisplay = document.querySelector('.member-count');
             if (countDisplay) {
@@ -316,17 +310,11 @@
         }
 
         function removeMember(name) {
-            if (typeof pendingMembers === 'undefined') {
-                pendingMembers = [];
-            }
             pendingMembers = pendingMembers.filter(member => member !== name);
             updateMembersList();
         }
 
         function updateMembersList() {
-            if (typeof pendingMembers === 'undefined') {
-                pendingMembers = [];
-            }
             const membersList = document.getElementById('membersList');
             membersList.innerHTML = pendingMembers.map(member => 
                 `<div class="member-chip">

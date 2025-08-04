@@ -15,6 +15,11 @@
         <div class="header">
             <h1>💰 RoomLedger</h1>
             <p>Smart debt tracking for families & roommates</p>
+            <div style="margin-top: var(--space-4); display: flex; justify-content: center; gap: var(--space-2);">
+                <span style="background: var(--success-100); color: var(--success-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">✨ Smart Settlement</span>
+                <span style="background: var(--primary-100); color: var(--primary-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">👥 Group Management</span>
+                <span style="background: var(--warning-100); color: var(--warning-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">📱 Mobile Friendly</span>
+            </div>
         </div>
 
         <!-- Auth Section -->
@@ -35,7 +40,7 @@
                     <label>Group Password</label>
                     <input type="password" id="loginPassword" placeholder="Enter group password">
                 </div>
-                <button class="btn" onclick="login()">Login</button>
+                <button class="btn btn-primary" onclick="login()">Login</button>
                 <div id="loginError" class="error"></div>
             </div>
 
@@ -52,11 +57,18 @@
                 </div>
                 <div class="form-group">
                     <label>Add Group Members</label>
-                    <input type="text" id="memberName" placeholder="Enter member name" onkeypress="handleMemberKeyPress(event)">
-                    <button class="btn btn-secondary" onclick="addMember()">Add Member</button>
+                    <div class="member-input-group">
+                        <div class="form-group">
+                            <input type="text" id="memberName" placeholder="Enter member name" onkeypress="handleMemberKeyPress(event)">
+                        </div>
+                        <button class="btn btn-secondary" onclick="addMember()">Add</button>
+                    </div>
                     <div id="membersList" class="member-list"></div>
+                    <small style="color: var(--gray-500); margin-top: var(--space-2); display: block;">
+                        💡 Tip: Press Enter to quickly add members
+                    </small>
                 </div>
-                <button class="btn" onclick="createGroup()">Create Group</button>
+                <button class="btn btn-primary" onclick="createGroup()">Create Group</button>
                 <div id="registerError" class="error"></div>
             </div>
         </div>
@@ -93,9 +105,9 @@
                     </div>
                     <div class="form-group">
                         <label>Split Between (Select all who should pay)</label>
-                        <div id="splitBetween"></div>
+                        <div id="splitBetween" class="checkbox-group"></div>
                     </div>
-                    <button class="btn" onclick="addDebt()">Add Expense</button>
+                    <button class="btn btn-primary" onclick="addDebt()">Add Expense</button>
                     <div id="debtError" class="error"></div>
                     <div id="debtSuccess" class="success"></div>
                 </div>
@@ -104,10 +116,10 @@
                 <div id="settleTab" class="tab-content">
                     <h3 style="margin-bottom: 20px;">Current Balances & Smart Settlement</h3>
                     <div id="currentBalances"></div>
-                    <button class="btn" onclick="calculateSettlement()">Calculate Smart Settlement</button>
+                    <button class="btn btn-primary" onclick="calculateSettlement()">Calculate Smart Settlement</button>
                     <div id="settlementResult"></div>
                     <div id="settleActions" class="hidden" style="margin-top: 20px;">
-                        <button class="btn" onclick="executeSettlement()">Confirm & Record Settlement</button>
+                        <button class="btn btn-primary" onclick="executeSettlement()">Confirm & Record Settlement</button>
                     </div>
                 </div>
 
@@ -120,14 +132,25 @@
                 <!-- Manage Group Tab -->
                 <div id="manageTab" class="tab-content">
                     <h3 style="margin-bottom: 20px;">Manage Group Members</h3>
-                    <div class="form-group">
-                        <label>Add New Member</label>
-                        <input type="text" id="newMemberName" placeholder="Enter member name">
-                        <button class="btn btn-secondary" onclick="addNewMember()">Add Member</button>
+                    
+                    <!-- Add New Member Section -->
+                    <div class="card" style="margin-bottom: var(--space-6);">
+                        <h4 style="margin-bottom: var(--space-4); color: var(--gray-700);">➕ Add New Member</h4>
+                        <div class="member-input-group">
+                            <div class="form-group">
+                                <input type="text" id="newMemberName" placeholder="Enter member name">
+                            </div>
+                            <button class="btn btn-secondary" onclick="addNewMember()">Add Member</button>
+                        </div>
+                        <div id="manageError" class="error"></div>
+                        <div id="manageSuccess" class="success"></div>
                     </div>
-                    <div id="currentMembers"></div>
-                    <div id="manageError" class="error"></div>
-                    <div id="manageSuccess" class="success"></div>
+                    
+                    <!-- Current Members Section -->
+                    <div class="card">
+                        <h4 style="margin-bottom: var(--space-4); color: var(--gray-700);">👥 Current Members</h4>
+                        <div id="currentMembers"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,11 +196,46 @@
 
         function addMember() {
             const memberName = document.getElementById('memberName').value.trim();
-            if (memberName && !pendingMembers.includes(memberName)) {
-                pendingMembers.push(memberName);
-                updateMembersList();
-                document.getElementById('memberName').value = '';
+            const errorDiv = document.getElementById('registerError');
+            
+            if (!memberName) {
+                errorDiv.textContent = 'Please enter a member name';
+                return;
             }
+            
+            if (memberName.length < 2) {
+                errorDiv.textContent = 'Member name must be at least 2 characters long';
+                return;
+            }
+            
+            if (pendingMembers.includes(memberName)) {
+                errorDiv.textContent = 'This member is already in the list';
+                return;
+            }
+            
+            // Check if it's the same as admin name
+            const adminName = document.getElementById('adminName').value.trim();
+            if (memberName.toLowerCase() === adminName.toLowerCase()) {
+                errorDiv.textContent = 'Member name cannot be the same as admin name';
+                return;
+            }
+            
+            pendingMembers.push(memberName);
+            updateMembersList();
+            document.getElementById('memberName').value = '';
+            errorDiv.textContent = '';
+            
+            // Show success feedback
+            const successFeedback = document.createElement('div');
+            successFeedback.className = 'success';
+            successFeedback.textContent = `✅ Added ${memberName} to the group`;
+            successFeedback.style.marginTop = 'var(--space-2)';
+            document.getElementById('membersList').appendChild(successFeedback);
+            
+            // Remove success message after 3 seconds
+            setTimeout(() => {
+                successFeedback.remove();
+            }, 3000);
         }
 
         function removeMember(name) {
@@ -355,12 +413,12 @@
                 `<option value="${member.id}">${member.username}</option>`
             ).join('');
             
-            // Split between checkboxes
+            // Split between checkboxes with improved styling
             splitBetweenDiv.innerHTML = groupMembers.map(member => 
-                `<label style="display: flex; align-items: center; margin-bottom: 8px;">
-                    <input type="checkbox" value="${member.id}" checked style="margin-right: 8px; width: auto;">
-                    ${member.username}
-                </label>`
+                `<div class="checkbox-item">
+                    <input type="checkbox" value="${member.id}" checked>
+                    <label>${member.username}</label>
+                </div>`
             ).join('');
         }
 
@@ -710,18 +768,42 @@
         function updateManageTab() {
             const currentMembersDiv = document.getElementById('currentMembers');
             
+            if (groupMembers.length === 0) {
+                currentMembersDiv.innerHTML = `
+                    <div style="text-align: center; padding: var(--space-8); color: var(--gray-500);">
+                        <div style="font-size: 3rem; margin-bottom: var(--space-4);">👥</div>
+                        <p>No members found</p>
+                    </div>
+                `;
+                return;
+            }
+            
             const membersHtml = groupMembers.map(member => {
                 const canRemove = currentUser.is_admin && member.id !== currentUser.id;
-                return `<div class="member-chip" style="justify-content: space-between; width: 100%; margin-bottom: 8px;">
-                    <span>${member.username} ${member.is_admin ? '(Admin)' : ''}</span>
-                    ${canRemove ? `<button class="remove-member" onclick="removeMemberFromGroup(${member.id})">×</button>` : ''}
+                const isCurrentUser = member.id === currentUser.id;
+                const roleBadge = member.is_admin ? 
+                    '<span style="background: var(--primary-100); color: var(--primary-700); padding: 2px 8px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">Admin</span>' : 
+                    '<span style="background: var(--gray-100); color: var(--gray-600); padding: 2px 8px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">Member</span>';
+                
+                return `<div class="transaction-item">
+                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-500), var(--primary-600)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                            ${member.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--gray-900);">
+                                ${member.username} ${isCurrentUser ? '(You)' : ''}
+                            </div>
+                            <div style="display: flex; gap: var(--space-2); margin-top: var(--space-1);">
+                                ${roleBadge}
+                            </div>
+                        </div>
+                    </div>
+                    ${canRemove ? `<button class="btn btn-danger" onclick="removeMemberFromGroup(${member.id})" style="padding: var(--space-2) var(--space-3); font-size: 0.75rem;">Remove</button>` : ''}
                 </div>`;
             }).join('');
 
-            currentMembersDiv.innerHTML = `
-                <h4 style="margin-bottom: 12px;">Current Members:</h4>
-                ${membersHtml}
-            `;
+            currentMembersDiv.innerHTML = membersHtml;
         }
 
         async function addNewMember() {
@@ -736,8 +818,13 @@
                 errorDiv.textContent = 'Please enter a member name';
                 return;
             }
+            
+            if (memberName.length < 2) {
+                errorDiv.textContent = 'Member name must be at least 2 characters long';
+                return;
+            }
 
-            if (groupMembers.some(member => member.username === memberName)) {
+            if (groupMembers.some(member => member.username.toLowerCase() === memberName.toLowerCase())) {
                 errorDiv.textContent = 'Member with this name already exists';
                 return;
             }
@@ -759,7 +846,12 @@
                 updateManageTab();
                 
                 document.getElementById('newMemberName').value = '';
-                successDiv.textContent = 'Member added successfully!';
+                successDiv.textContent = `✅ ${memberName} added successfully!`;
+                
+                // Clear success message after 3 seconds
+                setTimeout(() => {
+                    successDiv.textContent = '';
+                }, 3000);
 
             } catch (error) {
                 errorDiv.textContent = 'Error adding member: ' + error.message;

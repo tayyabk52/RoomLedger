@@ -201,11 +201,11 @@
 
     <script>
         // Initialize Supabase with environment variables
-        const SUPABASE_URL = window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL;
-        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+        const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
         
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-            console.error('Supabase configuration missing. Please check your environment variables.');
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+            console.error('Supabase configuration missing. Please update the SUPABASE_URL and SUPABASE_ANON_KEY in the JavaScript.');
         }
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -238,6 +238,9 @@
         }
 
         function addMember() {
+            if (typeof pendingMembers === 'undefined') {
+                pendingMembers = [];
+            }
             const memberName = document.getElementById('memberName').value.trim();
             const errorDiv = document.getElementById('registerError');
             
@@ -290,6 +293,9 @@
         }
         
         function updateMemberCount() {
+            if (typeof pendingMembers === 'undefined') {
+                pendingMembers = [];
+            }
             const totalMembers = pendingMembers.length + 1; // +1 for admin
             const countDisplay = document.querySelector('.member-count');
             if (countDisplay) {
@@ -298,11 +304,17 @@
         }
 
         function removeMember(name) {
+            if (typeof pendingMembers === 'undefined') {
+                pendingMembers = [];
+            }
             pendingMembers = pendingMembers.filter(member => member !== name);
             updateMembersList();
         }
 
         function updateMembersList() {
+            if (typeof pendingMembers === 'undefined') {
+                pendingMembers = [];
+            }
             const membersList = document.getElementById('membersList');
             membersList.innerHTML = pendingMembers.map(member => 
                 `<div class="member-chip">

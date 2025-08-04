@@ -204,27 +204,56 @@
     </div>
 
     <script>
-        // Initialize Supabase - Your working configuration
-        const SUPABASE_URL = 'https://mxgjpomavvdklqfbbsxh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Z2pwb21hdnZka2xxZmJic3hoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzI5NzAsImV4cCI6MjA1MDU0ODk3MH0.YOUR_ACTUAL_KEY_HERE';
+        // Initialize Supabase - Will be loaded securely from server
+        let SUPABASE_URL = null;
+        let SUPABASE_ANON_KEY = null;
         
-        // Check if Supabase is loaded
-        if (typeof window.supabase === 'undefined') {
-            console.error('Supabase client not loaded. Please check the CDN link.');
+        // Load Supabase credentials securely from server
+        async function loadSupabaseConfig() {
+            try {
+                const response = await fetch('/api/get-config');
+                if (response.ok) {
+                    const config = await response.json();
+                    SUPABASE_URL = config.supabaseUrl;
+                    SUPABASE_ANON_KEY = config.supabaseAnonKey;
+                    
+                    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                        throw new Error('Supabase credentials not found in environment variables');
+                    }
+                    
+                    // Initialize Supabase client
+                    initializeSupabase();
+                } else {
+                    throw new Error('Failed to load configuration');
+                }
+            } catch (error) {
+                console.error('⚠️ Failed to load Supabase configuration:', error.message);
+                console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables in Netlify');
+            }
         }
         
-        // Check if credentials are properly set
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR_ACTUAL_KEY_HERE')) {
-            console.error('⚠️ Please replace YOUR_ACTUAL_KEY_HERE with your complete Supabase anon key in index.html');
+        // Initialize Supabase client
+        function initializeSupabase() {
+            if (typeof window.supabase === 'undefined') {
+                console.error('Supabase client not loaded. Please check the CDN link.');
+                return;
+            }
+            
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase client initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Supabase client:', error);
+            }
         }
         
         // Initialize Supabase client with error handling
         let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (error) {
-            console.error('Failed to initialize Supabase client:', error);
-        }
+        
+        // Load configuration and initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSupabaseConfig();
+        });
 
         // Global variables - Initialize immediately
         let currentUser = null;

@@ -201,14 +201,26 @@
 
     <script>
         // Initialize Supabase with environment variables
-        const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
-        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
+        const SUPABASE_URL = window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
+        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
         
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
-            console.error('Supabase configuration missing. Please update the SUPABASE_URL and SUPABASE_ANON_KEY in the JavaScript.');
+        // Check if Supabase is loaded
+        if (typeof window.supabase === 'undefined') {
+            console.error('Supabase client not loaded. Please check the CDN link.');
         }
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Check if credentials are properly set
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+            console.error('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables in Netlify.');
+        }
+        
+        // Initialize Supabase client with error handling
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.error('Failed to initialize Supabase client:', error);
+        }
 
         // Global variables
         let currentUser = null;
@@ -340,6 +352,10 @@
             }
 
             try {
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
                 // Create group
                 const { data: groupData, error: groupError } = await supabase
                     .from('groups')
@@ -390,6 +406,10 @@
             }
 
             try {
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
                 // Find user and validate group password
                 const { data: userData, error: userError } = await supabase
                     .from('group_members')
@@ -552,6 +572,10 @@
 
         async function loadCurrentBalances() {
             try {
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
                 const { data: transactions, error } = await supabase
                     .from('transactions')
                     .select(`
@@ -602,6 +626,10 @@
 
         async function calculateSettlement() {
             try {
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
                 const { data: transactions, error } = await supabase
                     .from('transactions')
                     .select('*')
@@ -900,6 +928,10 @@
             }
 
             try {
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
                 const { data, error } = await supabase
                     .from('group_members')
                     .insert([{
@@ -939,6 +971,10 @@
             }
 
             try {
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
                 const { error } = await supabase
                     .from('group_members')
                     .delete()

@@ -809,3 +809,421 @@ body {
 .slide-in {
     animation: slideIn 0.3s ease;
 }
+
+/* Enhanced Auth Sections */
+.auth-section {
+    text-align: center;
+    padding: var(--space-6) 0;
+}
+
+.auth-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+    display: block;
+}
+
+.auth-description {
+    color: var(--label-secondary);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-6);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Enhanced Setup Steps */
+.setup-step {
+    margin-bottom: var(--space-8);
+    padding: var(--space-6);
+    background: var(--secondary-system-background);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--tertiary-system-background);
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.step-number {
+    background: var(--apple-blue);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.step-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--label-primary);
+}
+
+.step-description {
+    color: var(--label-secondary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-4);
+}
+
+/* Enhanced Member Counter */
+.member-counter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    justify-content: center;
+}
+
+.counter-badge {
+    background: var(--apple-blue);
+    color: white;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.counter-label {
+    font-size: var(--font-size-sm);
+}
+
+.counter-note {
+    color: var(--label-tertiary);
+    font-size: var(--font-size-sm);
+}
+
+/* Enhanced Input with Button */
+.input-with-button {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.input-with-button input {
+    flex: 1;
+}
+
+.btn-add {
+    flex-shrink: 0;
+    padding: var(--space-3) var(--space-4);
+}
+
+/* Enhanced Tips Card */
+.tips-card {
+    background: rgba(0, 122, 255, 0.05);
+    border: 1px solid rgba(0, 122, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.tips-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    color: var(--apple-blue);
+    font-weight: 600;
+}
+
+.tips-icon {
+    font-size: var(--font-size-lg);
+}
+
+.tips-list {
+    color: var(--label-secondary);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    padding-left: var(--space-4);
+}
+
+.tips-list li {
+    margin-bottom: var(--space-1);
+}
+
+/* Enhanced Create Group Section */
+.create-group-section {
+    margin-top: var(--space-8);
+}
+
+.create-group-card {
+    background: linear-gradient(135deg, var(--apple-green), var(--apple-blue));
+    color: white;
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.create-group-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.create-group-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.create-group-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+}
+
+.create-group-card h4 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.create-group-card p {
+    margin-bottom: var(--space-6);
+    opacity: 0.9;
+}
+
+.btn-create {
+    background: white;
+    color: var(--apple-blue);
+    font-weight: 600;
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--font-size-lg);
+}
+
+.btn-create:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Enhanced App Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--tertiary-system-background);
+}
+
+.welcome-section h2 {
+    margin-bottom: var(--space-1);
+    color: var(--label-primary);
+}
+
+.app-subtitle {
+    color: var(--label-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+}
+
+/* Enhanced Form Hints */
+.form-hint {
+    color: var(--label-tertiary);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-1);
+    display: block;
+}
+
+/* Enhanced Expense Form */
+.expense-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.split-description {
+    color: var(--label-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-3);
+}
+
+/* Enhanced Manage Sections */
+.manage-section {
+    margin-bottom: var(--space-8);
+    padding: var(--space-6);
+    background: var(--secondary-system-background);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--tertiary-system-background);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.section-icon {
+    font-size: var(--font-size-xl);
+    width: 40px;
+    height: 40px;
+    background: var(--apple-blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--label-primary);
+}
+
+.section-description {
+    color: var(--label-secondary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-4);
+}
+
+.add-member-form {
+    max-width: 400px;
+}
+
+.members-list {
+    display: grid;
+    gap: var(--space-3);
+}
+
+/* Enhanced Buttons */
+.btn-large {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+/* Enhanced Messages */
+.message {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+}
+
+.message.success {
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--apple-green);
+    border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+.message.error {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--apple-red);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+.message.warning {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--apple-orange);
+    border: 1px solid rgba(255, 149, 0, 0.2);
+}
+
+.message.info {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--apple-blue);
+    border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        gap: var(--space-4);
+        text-align: center;
+    }
+    
+    .input-with-button {
+        flex-direction: column;
+    }
+    
+    .btn-add {
+        width: 100%;
+    }
+    
+    .setup-step {
+        padding: var(--space-4);
+    }
+    
+    .create-group-card {
+        padding: var(--space-6);
+    }
+    
+    .manage-section {
+        padding: var(--space-4);
+    }
+    
+    .step-header {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-2);
+    }
+    
+    .member-counter {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    .tips-card {
+        padding: var(--space-3);
+    }
+    
+    .auth-icon {
+        font-size: 3rem;
+    }
+    
+    .auth-description {
+        font-size: var(--font-size-base);
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: var(--space-4);
+    }
+    
+    .btn-large {
+        padding: var(--space-3) var(--space-6);
+        font-size: var(--font-size-base);
+    }
+    
+    .create-group-card {
+        padding: var(--space-4);
+    }
+    
+    .create-group-icon {
+        font-size: 2rem;
+    }
+    
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: var(--font-size-xs);
+    }
+    
+    .section-icon {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-base);
+    }
+}

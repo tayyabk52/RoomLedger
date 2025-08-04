@@ -24,133 +24,227 @@
 
         <!-- Auth Section -->
         <div id="authSection" class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>🔐</span>
+                    Welcome to RoomLedger
+                </div>
+                <div class="card-subtitle">Track expenses and settle debts with your roommates</div>
+            </div>
+
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="showAuthTab('login')">Login</button>
-                <button class="tab-btn" onclick="showAuthTab('register')">Create Group</button>
+                <button class="tab-btn active" onclick="showAuthTab('login')">
+                    <span>👤</span>
+                    Login
+                </button>
+                <button class="tab-btn" onclick="showAuthTab('register')">
+                    <span>🏠</span>
+                    Create Group
+                </button>
             </div>
 
             <!-- Login Tab -->
             <div id="loginTab" class="tab-content active">
-                <h3 style="margin-bottom: 20px;">Login to Your Group</h3>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter your username">
+                <div class="auth-section">
+                    <div class="auth-icon">👤</div>
+                    <h3>Login to Your Group</h3>
+                    <p class="auth-description">Enter your credentials to access your expense tracking group</p>
+                    
+                    <div class="form-group">
+                        <label>Your Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username">
+                        <small class="form-hint">The username you used when creating the group</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Group Password</label>
+                        <form onsubmit="event.preventDefault(); login();">
+                            <input type="password" id="loginPassword" placeholder="Enter group password" autocomplete="current-password">
+                        </form>
+                        <small class="form-hint">The password shared with your group members</small>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large" onclick="login()">
+                        <span>🔓</span>
+                        Login to Group
+                    </button>
+                    
+                    <div id="loginError" class="message error"></div>
                 </div>
-                <div class="form-group">
-                    <label>Group Password</label>
-                    <form onsubmit="event.preventDefault(); login();">
-                        <input type="password" id="loginPassword" placeholder="Enter group password" autocomplete="current-password">
-                    </form>
-                </div>
-                <button class="btn btn-primary" onclick="login()">Login</button>
-                <div id="loginError" class="error"></div>
             </div>
 
             <!-- Register Tab -->
             <div id="registerTab" class="tab-content">
-                <h3 style="margin-bottom: 20px;">Create New Group</h3>
-                
-                <!-- Step 1: Admin Info -->
-                <div class="member-section">
-                    <h4>👤 Step 1: Your Information</h4>
-                    <div class="form-group">
-                        <label>Your Name (Group Admin)</label>
-                        <input type="text" id="adminName" placeholder="Enter your full name">
-                    </div>
-                    <div class="form-group">
-                        <label>Group Password</label>
-                        <form onsubmit="event.preventDefault(); createGroup();">
-                        <input type="password" id="groupPassword" placeholder="Create a secure password for your group" autocomplete="new-password">
-                    </form>
-                        <small style="color: var(--gray-500); margin-top: var(--space-2); display: block;">
-                            🔒 This password will be shared with all group members
-                        </small>
-                    </div>
-                </div>
-                
-                <!-- Step 2: Add Members -->
-                <div class="member-section">
-                    <h4>👥 Step 2: Add Group Members</h4>
-                    <p style="color: var(--gray-600); margin-bottom: var(--space-4); font-size: 0.875rem;">
-                        Add the names of people who will be sharing expenses. You can add more members later.
-                    </p>
-                    <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4);">
-                        <span style="background: rgba(0, 122, 255, 0.1); color: var(--apple-blue); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: 14px; font-weight: 600;">
-                            <span class="member-count">1 member</span>
-                        </span>
-                        <span style="color: var(--label-tertiary); font-size: 14px;">(including you)</span>
-                    </div>
+                <div class="auth-section">
+                    <div class="auth-icon">🏠</div>
+                    <h3>Create New Group</h3>
+                    <p class="auth-description">Set up your expense tracking group and invite your roommates</p>
                     
-                    <div class="member-input-group">
+                    <!-- Step 1: Admin Info -->
+                    <div class="setup-step">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <div class="step-title">👤 Your Information</div>
+                        </div>
+                        <p class="step-description">Set up your admin account for the group</p>
+                        
                         <div class="form-group">
-                            <input type="text" id="memberName" placeholder="Enter member name" onkeypress="handleMemberKeyPress(event)">
+                            <label>Your Name (Group Admin)</label>
+                            <input type="text" id="adminName" placeholder="Enter your full name">
+                            <small class="form-hint">This will be your display name in the group</small>
                         </div>
-                        <button class="btn btn-secondary" onclick="addMember()">Add Member</button>
-                    </div>
-                    
-                    <div id="membersList" class="member-list"></div>
-                    
-                    <div style="margin-top: var(--space-4); padding: var(--space-3); background: rgba(0, 122, 255, 0.05); border-radius: var(--radius-lg); border: 1px solid rgba(0, 122, 255, 0.1);">
-                        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
-                            <span style="font-size: 1.2rem;">💡</span>
-                            <strong style="color: var(--apple-blue);">Quick Tips:</strong>
+                        
+                        <div class="form-group">
+                            <label>Group Password</label>
+                            <form onsubmit="event.preventDefault(); createGroup();">
+                                <input type="password" id="groupPassword" placeholder="Create a secure password for your group" autocomplete="new-password">
+                            </form>
+                            <small class="form-hint">
+                                <span style="color: var(--apple-orange);">🔒</span>
+                                This password will be shared with all group members
+                            </small>
                         </div>
-                        <ul style="color: var(--label-secondary); font-size: 14px; margin: 0; padding-left: var(--space-4);">
-                            <li>Press <strong>Enter</strong> to quickly add members</li>
-                            <li>Add at least 2-3 members for better expense tracking</li>
-                            <li>You can add more members after creating the group</li>
-                        </ul>
                     </div>
-                </div>
                 
-                <!-- Step 3: Create Group -->
-                <div style="text-align: center; margin-top: var(--space-6);">
-                    <button class="btn btn-primary" onclick="createGroup()" style="padding: var(--space-4) var(--space-8); font-size: 1rem;">
-                        🚀 Create Group & Start Tracking
-                    </button>
-                </div>
+                    <!-- Step 2: Add Members -->
+                    <div class="setup-step">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <div class="step-title">👥 Add Group Members</div>
+                        </div>
+                        <p class="step-description">Invite your roommates to join the expense tracking group</p>
+                        
+                        <div class="member-counter">
+                            <div class="counter-badge">
+                                <span class="member-count">1</span>
+                                <span class="counter-label">member</span>
+                            </div>
+                            <span class="counter-note">(including you)</span>
+                        </div>
+                        
+                        <div class="member-input-section">
+                            <div class="form-group">
+                                <label>Member Name</label>
+                                <div class="input-with-button">
+                                    <input type="text" id="memberName" placeholder="Enter member name" onkeypress="handleMemberKeyPress(event)">
+                                    <button class="btn btn-secondary btn-add" onclick="addMember()">
+                                        <span>➕</span>
+                                        Add
+                                    </button>
+                                </div>
+                                <small class="form-hint">Press Enter to quickly add members</small>
+                            </div>
+                        </div>
+                        
+                        <div id="membersList" class="member-list"></div>
+                        
+                        <div class="tips-card">
+                            <div class="tips-header">
+                                <span class="tips-icon">💡</span>
+                                <strong>Quick Tips</strong>
+                            </div>
+                            <ul class="tips-list">
+                                <li>Press <strong>Enter</strong> to quickly add members</li>
+                                <li>Add at least 2-3 members for better expense tracking</li>
+                                <li>You can add more members after creating the group</li>
+                            </ul>
+                        </div>
+                    </div>
                 
-                <div id="registerError" class="error"></div>
+                    <!-- Step 3: Create Group -->
+                    <div class="create-group-section">
+                        <div class="create-group-card">
+                            <div class="create-group-icon">🚀</div>
+                            <h4>Ready to Start Tracking?</h4>
+                            <p>Your group will be created and you can start adding expenses immediately</p>
+                            
+                            <button class="btn btn-primary btn-large btn-create" onclick="createGroup()">
+                                <span>🚀</span>
+                                Create Group & Start Tracking
+                            </button>
+                            
+                            <div id="registerError" class="message error"></div>
+                        </div>
+                    </div>
             </div>
         </div>
 
         <!-- Main App Section -->
         <div id="appSection" class="hidden">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 id="welcomeMessage">Welcome!</h2>
-                    <button class="btn btn-secondary" onclick="logout()" style="width: auto;">Logout</button>
+                <div class="app-header">
+                    <div class="welcome-section">
+                        <h2 id="welcomeMessage">Welcome!</h2>
+                        <p class="app-subtitle">Track expenses and settle debts with your roommates</p>
+                    </div>
+                    <button class="btn btn-secondary btn-logout" onclick="logout()">
+                        <span>🚪</span>
+                        Logout
+                    </button>
                 </div>
                 
                 <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="showTab('addDebt')">Add Debt</button>
-                    <button class="tab-btn" onclick="showTab('settle')">Settle All</button>
-                    <button class="tab-btn" onclick="showTab('history')">History</button>
-                    <button class="tab-btn" onclick="showTab('manage')">Manage Group</button>
+                    <button class="tab-btn active" onclick="showTab('addDebt')">
+                        <span>➕</span>
+                        Add Expense
+                    </button>
+                    <button class="tab-btn" onclick="showTab('settle')">
+                        <span>💰</span>
+                        Settle All
+                    </button>
+                    <button class="tab-btn" onclick="showTab('history')">
+                        <span>📜</span>
+                        History
+                    </button>
+                    <button class="tab-btn" onclick="showTab('manage')">
+                        <span>👥</span>
+                        Manage Group
+                    </button>
                 </div>
 
                 <!-- Add Debt Tab -->
                 <div id="addDebtTab" class="tab-content active">
-                    <h3 style="margin-bottom: 20px;">Add New Expense</h3>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <input type="text" id="debtDescription" placeholder="e.g., Dinner at restaurant, Uber ride">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>➕</span>
+                            Add New Expense
+                        </div>
+                        <div class="card-subtitle">Record shared expenses and track who owes what</div>
                     </div>
-                    <div class="form-group">
-                        <label>Who Paid?</label>
-                        <select id="whoPaid"></select>
+                    
+                    <div class="expense-form">
+                        <div class="form-group">
+                            <label>Expense Description</label>
+                            <input type="text" id="debtDescription" placeholder="e.g., Dinner at restaurant, Uber ride, Groceries">
+                            <small class="form-hint">Describe what the expense was for</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Who Paid?</label>
+                            <select id="whoPaid"></select>
+                            <small class="form-hint">Select who covered this expense</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Amount (PKR)</label>
+                            <input type="number" id="debtAmount" placeholder="Enter amount" step="0.01" min="0">
+                            <small class="form-hint">Total amount that was paid</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Split Between</label>
+                            <div class="split-description">Select all members who should contribute to this expense</div>
+                            <div id="splitBetween" class="checkbox-group"></div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-large" onclick="addDebt()">
+                            <span>➕</span>
+                            Add Expense
+                        </button>
+                        
+                        <div id="debtError" class="message error"></div>
+                        <div id="debtSuccess" class="message success"></div>
                     </div>
-                    <div class="form-group">
-                        <label>Amount (PKR)</label>
-                        <input type="number" id="debtAmount" placeholder="Enter amount">
-                    </div>
-                    <div class="form-group">
-                        <label>Split Between (Select all who should pay)</label>
-                        <div id="splitBetween" class="checkbox-group"></div>
-                    </div>
-                    <button class="btn btn-primary" onclick="addDebt()">Add Expense</button>
-                    <div id="debtError" class="error"></div>
-                    <div id="debtSuccess" class="success"></div>
                 </div>
 
                 <!-- Settle Tab -->
@@ -188,37 +282,64 @@
 
                 <!-- History Tab -->
                 <div id="historyTab" class="tab-content">
-                    <h3 style="margin-bottom: 20px;">Settlement History</h3>
-                    <div id="historyList"></div>
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📜</span>
+                            Settlement History
+                        </div>
+                        <div class="card-subtitle">View past settlements and payment records</div>
+                    </div>
+                    
+                    <div class="history-content">
+                        <div id="historyList"></div>
+                    </div>
                 </div>
 
                 <!-- Manage Group Tab -->
                 <div id="manageTab" class="tab-content">
-                    <h3 style="margin-bottom: 20px;">Manage Group Members</h3>
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>👥</span>
+                            Manage Group Members
+                        </div>
+                        <div class="card-subtitle">Add new members and manage existing ones</div>
+                    </div>
                     
                     <!-- Add New Member Section -->
-                    <div class="member-section">
-                        <h4>➕ Add New Member</h4>
-                        <p style="color: var(--gray-600); margin-bottom: var(--space-4); font-size: 0.875rem;">
-                            Invite new members to join your expense tracking group.
-                        </p>
-                        <div class="member-input-group">
-                            <div class="form-group">
-                                <input type="text" id="newMemberName" placeholder="Enter member name">
-                            </div>
-                            <button class="btn btn-secondary" onclick="addNewMember()">Add Member</button>
+                    <div class="manage-section">
+                        <div class="section-header">
+                            <div class="section-icon">➕</div>
+                            <div class="section-title">Add New Member</div>
                         </div>
-                        <div id="manageError" class="error"></div>
-                        <div id="manageSuccess" class="success"></div>
+                        <p class="section-description">Invite new members to join your expense tracking group</p>
+                        
+                        <div class="add-member-form">
+                            <div class="form-group">
+                                <label>New Member Name</label>
+                                <div class="input-with-button">
+                                    <input type="text" id="newMemberName" placeholder="Enter member name">
+                                    <button class="btn btn-secondary btn-add" onclick="addNewMember()">
+                                        <span>➕</span>
+                                        Add
+                                    </button>
+                                </div>
+                                <small class="form-hint">New members can login with the group password</small>
+                            </div>
+                        </div>
+                        
+                        <div id="manageError" class="message error"></div>
+                        <div id="manageSuccess" class="message success"></div>
                     </div>
                     
                     <!-- Current Members Section -->
-                    <div class="member-section">
-                        <h4>👥 Current Members</h4>
-                        <p style="color: var(--gray-600); margin-bottom: var(--space-4); font-size: 0.875rem;">
-                            Manage existing group members. Only admins can remove members.
-                        </p>
-                        <div id="currentMembers"></div>
+                    <div class="manage-section">
+                        <div class="section-header">
+                            <div class="section-icon">👥</div>
+                            <div class="section-title">Current Members</div>
+                        </div>
+                        <p class="section-description">Manage existing group members. Only admins can remove members</p>
+                        
+                        <div class="members-list" id="currentMembers"></div>
                     </div>
                 </div>
             </div>

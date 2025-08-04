@@ -38,7 +38,9 @@
                 </div>
                 <div class="form-group">
                     <label>Group Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter group password">
+                    <form onsubmit="event.preventDefault(); login();">
+                        <input type="password" id="loginPassword" placeholder="Enter group password">
+                    </form>
                 </div>
                 <button class="btn btn-primary" onclick="login()">Login</button>
                 <div id="loginError" class="error"></div>
@@ -57,7 +59,9 @@
                     </div>
                     <div class="form-group">
                         <label>Group Password</label>
+                        <form onsubmit="event.preventDefault(); createGroup();">
                         <input type="password" id="groupPassword" placeholder="Create a secure password for your group">
+                    </form>
                         <small style="color: var(--gray-500); margin-top: var(--space-2); display: block;">
                             🔒 This password will be shared with all group members
                         </small>
@@ -200,9 +204,9 @@
     </div>
 
     <script>
-        // Initialize Supabase with environment variables
-        const SUPABASE_URL = window.ENV?.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
-        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
+        // Initialize Supabase - You need to replace these with your actual values
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE'; // Replace with your Supabase project URL
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'; // Replace with your Supabase anon key
         
         // Check if Supabase is loaded
         if (typeof window.supabase === 'undefined') {
@@ -211,7 +215,7 @@
         
         // Check if credentials are properly set
         if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
-            console.error('Supabase configuration missing. Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables in Netlify.');
+            console.error('⚠️ Supabase configuration missing! Please update the SUPABASE_URL and SUPABASE_ANON_KEY values in index.html with your actual Supabase credentials.');
         }
         
         // Initialize Supabase client with error handling

@@ -39,7 +39,7 @@
                 <div class="form-group">
                     <label>Group Password</label>
                     <form onsubmit="event.preventDefault(); login();">
-                        <input type="password" id="loginPassword" placeholder="Enter group password">
+                        <input type="password" id="loginPassword" placeholder="Enter group password" autocomplete="current-password">
                     </form>
                 </div>
                 <button class="btn btn-primary" onclick="login()">Login</button>
@@ -60,7 +60,7 @@
                     <div class="form-group">
                         <label>Group Password</label>
                         <form onsubmit="event.preventDefault(); createGroup();">
-                        <input type="password" id="groupPassword" placeholder="Create a secure password for your group">
+                        <input type="password" id="groupPassword" placeholder="Create a secure password for your group" autocomplete="new-password">
                     </form>
                         <small style="color: var(--gray-500); margin-top: var(--space-2); display: block;">
                             🔒 This password will be shared with all group members
@@ -211,7 +211,7 @@
         // Load Supabase credentials securely from server
         async function loadSupabaseConfig() {
             try {
-                const response = await fetch('/api/get-config');
+                const response = await fetch('/.netlify/functions/get-config');
                 if (response.ok) {
                     const config = await response.json();
                     SUPABASE_URL = config.supabaseUrl;
@@ -228,7 +228,11 @@
                 }
             } catch (error) {
                 console.error('⚠️ Failed to load Supabase configuration:', error.message);
-                console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables in Netlify');
+                if (error.message.includes('Unexpected token')) {
+                    console.error('The serverless function is not found. Please check your Netlify deployment.');
+                } else {
+                    console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables in Netlify');
+                }
             }
         }
         

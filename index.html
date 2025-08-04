@@ -611,7 +611,7 @@
 
                 // Try to use Python API for advanced settlement calculation
                 try {
-                    const response = await fetch('/.netlify/functions/smart-settlement', {
+                    const response = await fetch('/api/smart-settlement', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

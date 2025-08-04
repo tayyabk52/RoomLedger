@@ -1,0 +1,30 @@
+{
+  "name": "roomledger",
+  "version": "1.0.0",
+  "description": "Smart debt tracking for families & roommates",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server .",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "debt-tracker",
+    "expense-splitting",
+    "roommates",
+    "family-finance",
+    "settlement"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/roomledger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/roomledger/issues"
+  },
+  "homepage": "https://github.com/yourusername/roomledger#readme",
+  "devDependencies": {},
+  "dependencies": {}
+} 

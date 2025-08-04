@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomLedger - Smart Debt Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.7/umd/supabase.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 RoomLedger</h1>
+            <p>Smart debt tracking for families & roommates</p>
+        </div>
+
+        <!-- Auth Section -->
+        <div id="authSection" class="card">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showAuthTab('login')">Login</button>
+                <button class="tab-btn" onclick="showAuthTab('register')">Create Group</button>
+            </div>
+
+            <!-- Login Tab -->
+            <div id="loginTab" class="tab-content active">
+                <h3 style="margin-bottom: 20px;">Login to Your Group</h3>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label>Group Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter group password">
+                </div>
+                <button class="btn" onclick="login()">Login</button>
+                <div id="loginError" class="error"></div>
+            </div>
+
+            <!-- Register Tab -->
+            <div id="registerTab" class="tab-content">
+                <h3 style="margin-bottom: 20px;">Create New Group</h3>
+                <div class="form-group">
+                    <label>Your Name (Group Admin)</label>
+                    <input type="text" id="adminName" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Group Password</label>
+                    <input type="password" id="groupPassword" placeholder="Create a password for your group">
+                </div>
+                <div class="form-group">
+                    <label>Add Group Members</label>
+                    <input type="text" id="memberName" placeholder="Enter member name" onkeypress="handleMemberKeyPress(event)">
+                    <button class="btn btn-secondary" onclick="addMember()">Add Member</button>
+                    <div id="membersList" class="member-list"></div>
+                </div>
+                <button class="btn" onclick="createGroup()">Create Group</button>
+                <div id="registerError" class="error"></div>
+            </div>
+        </div>
+
+        <!-- Main App Section -->
+        <div id="appSection" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 id="welcomeMessage">Welcome!</h2>
+                    <button class="btn btn-secondary" onclick="logout()" style="width: auto;">Logout</button>
+                </div>
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('addDebt')">Add Debt</button>
+                    <button class="tab-btn" onclick="showTab('settle')">Settle All</button>
+                    <button class="tab-btn" onclick="showTab('history')">History</button>
+                    <button class="tab-btn" onclick="showTab('manage')">Manage Group</button>
+                </div>
+
+                <!-- Add Debt Tab -->
+                <div id="addDebtTab" class="tab-content active">
+                    <h3 style="margin-bottom: 20px;">Add New Expense</h3>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="debtDescription" placeholder="e.g., Dinner at restaurant, Uber ride">
+                    </div>
+                    <div class="form-group">
+                        <label>Who Paid?</label>
+                        <select id="whoPaid"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (PKR)</label>
+                        <input type="number" id="debtAmount" placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <label>Split Between (Select all who should pay)</label>
+                        <div id="splitBetween"></div>
+                    </div>
+                    <button class="btn" onclick="addDebt()">Add Expense</button>
+                    <div id="debtError" class="error"></div>
+                    <div id="debtSuccess" class="success"></div>
+                </div>
+
+                <!-- Settle Tab -->
+                <div id="settleTab" class="tab-content">
+                    <h3 style="margin-bottom: 20px;">Current Balances & Smart Settlement</h3>
+                    <div id="currentBalances"></div>
+                    <button class="btn" onclick="calculateSettlement()">Calculate Smart Settlement</button>
+                    <div id="settlementResult"></div>
+                    <div id="settleActions" class="hidden" style="margin-top: 20px;">
+                        <button class="btn" onclick="executeSettlement()">Confirm & Record Settlement</button>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="historyTab" class="tab-content">
+                    <h3 style="margin-bottom: 20px;">Settlement History</h3>
+                    <div id="historyList"></div>
+                </div>
+
+                <!-- Manage Group Tab -->
+                <div id="manageTab" class="tab-content">
+                    <h3 style="margin-bottom: 20px;">Manage Group Members</h3>
+                    <div class="form-group">
+                        <label>Add New Member</label>
+                        <input type="text" id="newMemberName" placeholder="Enter member name">
+                        <button class="btn btn-secondary" onclick="addNewMember()">Add Member</button>
+                    </div>
+                    <div id="currentMembers"></div>
+                    <div id="manageError" class="error"></div>
+                    <div id="manageSuccess" class="success"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase with environment variables
+        const SUPABASE_URL = window.ENV?.SUPABASE_URL || process.env.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+        
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+            console.error('Supabase configuration missing. Please check your environment variables.');
+        }
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Global variables
+        let currentUser = null;
+        let currentGroup = null;
+        let groupMembers = [];
+        let pendingMembers = [];
+        let currentSettlement = null;
+
+        // Auth functions
+        function showAuthTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('loginTab').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('registerTab').classList.add('active');
+            }
+        }
+
+        function handleMemberKeyPress(event) {
+            if (event.key === 'Enter') {
+                addMember();
+            }
+        }
+
+        function addMember() {
+            const memberName = document.getElementById('memberName').value.trim();
+            if (memberName && !pendingMembers.includes(memberName)) {
+                pendingMembers.push(memberName);
+                updateMembersList();
+                document.getElementById('memberName').value = '';
+            }
+        }
+
+        function removeMember(name) {
+            pendingMembers = pendingMembers.filter(member => member !== name);
+            updateMembersList();
+        }
+
+        function updateMembersList() {
+            const membersList = document.getElementById('membersList');
+            membersList.innerHTML = pendingMembers.map(member => 
+                `<div class="member-chip">
+                    ${member}
+                    <button class="remove-member" onclick="removeMember('${member}')">×</button>
+                </div>`
+            ).join('');
+        }
+
+        async function createGroup() {
+            const adminName = document.getElementById('adminName').value.trim();
+            const password = document.getElementById('groupPassword').value.trim();
+            const errorDiv = document.getElementById('registerError');
+
+            if (!adminName || !password) {
+                errorDiv.textContent = 'Please fill in all fields';
+                return;
+            }
+
+            if (pendingMembers.length === 0) {
+                errorDiv.textContent = 'Please add at least one group member';
+                return;
+            }
+
+            try {
+                // Create group
+                const { data: groupData, error: groupError } = await supabase
+                    .from('groups')
+                    .insert([{ password: password }])
+                    .select();
+
+                if (groupError) throw groupError;
+
+                const groupId = groupData[0].id;
+
+                // Add admin and members
+                const allMembers = [adminName, ...pendingMembers];
+                const memberInserts = allMembers.map((name, index) => ({
+                    group_id: groupId,
+                    username: name,
+                    is_admin: index === 0
+                }));
+
+                const { error: membersError } = await supabase
+                    .from('group_members')
+                    .insert(memberInserts);
+
+                if (membersError) throw membersError;
+
+                errorDiv.textContent = '';
+                alert('Group created successfully! You can now login.');
+                showAuthTab('login');
+                
+                // Clear form
+                document.getElementById('adminName').value = '';
+                document.getElementById('groupPassword').value = '';
+                pendingMembers = [];
+                updateMembersList();
+
+            } catch (error) {
+                errorDiv.textContent = 'Error creating group: ' + error.message;
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            if (!username || !password) {
+                errorDiv.textContent = 'Please enter username and password';
+                return;
+            }
+
+            try {
+                // Find user and validate group password
+                const { data: userData, error: userError } = await supabase
+                    .from('group_members')
+                    .select(`
+                        *,
+                        groups!inner(*)
+                    `)
+                    .eq('username', username)
+                    .single();
+
+                if (userError || !userData) {
+                    errorDiv.textContent = 'User not found';
+                    return;
+                }
+
+                if (userData.groups.password !== password) {
+                    errorDiv.textContent = 'Incorrect password';
+                    return;
+                }
+
+                // Get all group members
+                const { data: membersData, error: membersError } = await supabase
+                    .from('group_members')
+                    .select('*')
+                    .eq('group_id', userData.group_id);
+
+                if (membersError) throw membersError;
+
+                currentUser = userData;
+                currentGroup = userData.groups;
+                groupMembers = membersData;
+
+                showApp();
+                errorDiv.textContent = '';
+
+            } catch (error) {
+                errorDiv.textContent = 'Login error: ' + error.message;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentGroup = null;
+            groupMembers = [];
+            
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('appSection').classList.add('hidden');
+            
+            // Clear form fields
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showApp() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            
+            document.getElementById('welcomeMessage').textContent = `Welcome, ${currentUser.username}!`;
+            
+            updateDropdowns();
+            loadCurrentBalances();
+            loadHistory();
+            updateManageTab();
+        }
+
+        // Main app functions
+        function showTab(tab) {
+            document.querySelectorAll('#appSection .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#appSection .tab-content').forEach(content => content.classList.remove('active'));
+            
+            const tabs = ['addDebt', 'settle', 'history', 'manage'];
+            const index = tabs.indexOf(tab);
+            
+            document.querySelectorAll('#appSection .tab-btn')[index].classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            if (tab === 'settle') {
+                loadCurrentBalances();
+            } else if (tab === 'history') {
+                loadHistory();
+            } else if (tab === 'manage') {
+                updateManageTab();
+            }
+        }
+
+        function updateDropdowns() {
+            const whoPaidSelect = document.getElementById('whoPaid');
+            const splitBetweenDiv = document.getElementById('splitBetween');
+            
+            // Who paid dropdown
+            whoPaidSelect.innerHTML = groupMembers.map(member => 
+                `<option value="${member.id}">${member.username}</option>`
+            ).join('');
+            
+            // Split between checkboxes
+            splitBetweenDiv.innerHTML = groupMembers.map(member => 
+                `<label style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <input type="checkbox" value="${member.id}" checked style="margin-right: 8px; width: auto;">
+                    ${member.username}
+                </label>`
+            ).join('');
+        }
+
+        async function addDebt() {
+            const description = document.getElementById('debtDescription').value.trim();
+            const whoPaid = document.getElementById('whoPaid').value;
+            const amount = parseFloat(document.getElementById('debtAmount').value);
+            const splitBetween = Array.from(document.querySelectorAll('#splitBetween input:checked')).map(cb => parseInt(cb.value));
+            
+            const errorDiv = document.getElementById('debtError');
+            const successDiv = document.getElementById('debtSuccess');
+            
+            errorDiv.textContent = '';
+            successDiv.textContent = '';
+
+            if (!description || !amount || splitBetween.length === 0) {
+                errorDiv.textContent = 'Please fill in all fields and select at least one person to split between';
+                return;
+            }
+
+            try {
+                const perPersonAmount = amount / splitBetween.length;
+                
+                // Create transactions for each person who owes money
+                const transactions = splitBetween
+                    .filter(personId => personId !== parseInt(whoPaid))
+                    .map(personId => ({
+                        group_id: currentGroup.id,
+                        description: description,
+                        from_member_id: personId,
+                        to_member_id: parseInt(whoPaid),
+                        amount: perPersonAmount,
+                        created_by: currentUser.id
+                    }));
+
+                if (transactions.length > 0) {
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert(transactions);
+
+                    if (error) throw error;
+                }
+
+                successDiv.textContent = 'Expense added successfully!';
+                
+                // Clear form
+                document.getElementById('debtDescription').value = '';
+                document.getElementById('debtAmount').value = '';
+                
+                // Refresh balances if on settle tab
+                const settleTab = document.getElementById('settleTab');
+                if (settleTab.classList.contains('active')) {
+                    loadCurrentBalances();
+                }
+
+            } catch (error) {
+                errorDiv.textContent = 'Error adding expense: ' + error.message;
+            }
+        }
+
+        async function loadCurrentBalances() {
+            try {
+                const { data: transactions, error } = await supabase
+                    .from('transactions')
+                    .select(`
+                        *,
+                        from_member:group_members!from_member_id(username),
+                        to_member:group_members!to_member_id(username)
+                    `)
+                    .eq('group_id', currentGroup.id)
+                    .eq('settled', false);
+
+                if (error) throw error;
+
+                // Calculate net balances
+                const balances = {};
+                groupMembers.forEach(member => {
+                    balances[member.id] = { name: member.username, balance: 0 };
+                });
+
+                transactions.forEach(transaction => {
+                    balances[transaction.from_member_id].balance -= transaction.amount;
+                    balances[transaction.to_member_id].balance += transaction.amount;
+                });
+
+                // Display balances
+                const balancesDiv = document.getElementById('currentBalances');
+                const balanceItems = Object.values(balances)
+                    .filter(person => Math.abs(person.balance) > 0.01)
+                    .map(person => {
+                        const isPositive = person.balance > 0;
+                        const color = isPositive ? '#38a169' : '#e53e3e';
+                        const text = isPositive ? 'is owed' : 'owes';
+                        return `<div class="transaction-item">
+                            <strong>${person.name}</strong> ${text} 
+                            <span style="color: ${color};">PKR ${Math.abs(person.balance).toFixed(2)}</span>
+                        </div>`;
+                    });
+
+                if (balanceItems.length === 0) {
+                    balancesDiv.innerHTML = '<div class="transaction-item">✅ Everyone is settled up!</div>';
+                } else {
+                    balancesDiv.innerHTML = balanceItems.join('');
+                }
+
+            } catch (error) {
+                console.error('Error loading balances:', error);
+            }
+        }
+
+        async function calculateSettlement() {
+            try {
+                const { data: transactions, error } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('group_id', currentGroup.id)
+                    .eq('settled', false);
+
+                if (error) throw error;
+
+                // Calculate net balances
+                const balances = {};
+                groupMembers.forEach(member => {
+                    balances[member.id] = 0;
+                });
+
+                transactions.forEach(transaction => {
+                    balances[transaction.from_member_id] -= transaction.amount;
+                    balances[transaction.to_member_id] += transaction.amount;
+                });
+
+                // Try to use Python API for advanced settlement calculation
+                try {
+                    const response = await fetch('/.netlify/functions/smart-settlement', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            balances: balances,
+                            members: groupMembers
+                        })
+                    });
+
+                    if (response.ok) {
+                        const apiResult = await response.json();
+                        currentSettlement = apiResult.settlements;
+                        displaySettlementResult(apiResult.settlements, apiResult.optimization_info);
+                        return;
+                    }
+                } catch (apiError) {
+                    console.log('Python API unavailable, using JavaScript fallback');
+                }
+
+                // Fallback to JavaScript algorithm
+                const settlements = calculateSettlementJS(balances);
+                currentSettlement = settlements;
+                displaySettlementResult(settlements);
+
+            } catch (error) {
+                console.error('Error calculating settlement:', error);
+            }
+        }
+
+        function calculateSettlementJS(balances) {
+            // JavaScript fallback algorithm
+            const creditors = [];
+            const debtors = [];
+
+            Object.entries(balances).forEach(([personId, balance]) => {
+                if (balance > 0.01) {
+                    creditors.push({ id: parseInt(personId), amount: balance });
+                } else if (balance < -0.01) {
+                    debtors.push({ id: parseInt(personId), amount: -balance });
+                }
+            });
+
+            const settlements = [];
+            let i = 0, j = 0;
+
+            while (i < creditors.length && j < debtors.length) {
+                const creditor = creditors[i];
+                const debtor = debtors[j];
+                
+                const settleAmount = Math.min(creditor.amount, debtor.amount);
+                
+                const creditorName = groupMembers.find(m => m.id === creditor.id).username;
+                const debtorName = groupMembers.find(m => m.id === debtor.id).username;
+                
+                settlements.push({
+                    from: debtor.id,
+                    to: creditor.id,
+                    fromName: debtorName,
+                    toName: creditorName,
+                    amount: settleAmount
+                });
+
+                creditor.amount -= settleAmount;
+                debtor.amount -= settleAmount;
+
+                if (creditor.amount < 0.01) i++;
+                if (debtor.amount < 0.01) j++;
+            }
+
+            return settlements;
+        }
+
+        function displaySettlementResult(settlements, optimizationInfo = null) {
+            const resultDiv = document.getElementById('settlementResult');
+            const actionsDiv = document.getElementById('settleActions');
+
+            if (settlements.length === 0) {
+                resultDiv.innerHTML = '<div class="settlement-result no-settlements">✅ Everyone is already settled up!</div>';
+                actionsDiv.classList.add('hidden');
+            } else {
+                let optimizationText = '';
+                if (optimizationInfo) {
+                    optimizationText = `
+                        <div class="optimization-info">
+                            <div class="optimization-stat">
+                                <span class="stat-label">Algorithm Used:</span>
+                                <span class="stat-value">${optimizationInfo.algorithm}</span>
+                            </div>
+                            <div class="optimization-stat">
+                                <span class="stat-label">Optimization Time:</span>
+                                <span class="stat-value">${optimizationInfo.computation_time}ms</span>
+                            </div>
+                            <div class="optimization-stat">
+                                <span class="stat-label">Efficiency Gain:</span>
+                                <span class="stat-value">${optimizationInfo.efficiency_percentage}%</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const settlementHtml = `
+                    <div class="settlement-result">
+                        <div class="settlement-header">
+                            <h4>💡 Smart Settlement Plan</h4>
+                            <p>Optimized to minimize transactions</p>
+                        </div>
+                        ${optimizationText}
+                        <div class="settlement-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Required Payments:</span>
+                                <span class="summary-value">${settlements.length}</span>
+                            </div>
+                        </div>
+                        <div class="settlement-list">
+                            ${settlements.map(settlement => 
+                                `<div class="settlement-item">
+                                    <div class="settlement-flow">
+                                        <span class="payer">${settlement.fromName}</span>
+                                        <span class="arrow">→</span>
+                                        <span class="payee">${settlement.toName}</span>
+                                    </div>
+                                    <span class="amount">₹${settlement.amount.toFixed(2)}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+                resultDiv.innerHTML = settlementHtml;
+                actionsDiv.classList.remove('hidden');
+            }
+        }
+
+        async function executeSettlement() {
+            if (!currentSettlement || currentSettlement.length === 0) return;
+
+            try {
+                // Mark all current transactions as settled
+                const { error: updateError } = await supabase
+                    .from('transactions')
+                    .update({ settled: true })
+                    .eq('group_id', currentGroup.id)
+                    .eq('settled', false);
+
+                if (updateError) throw updateError;
+
+                // Create settlement record
+                const { error: settlementError } = await supabase
+                    .from('settlements')
+                    .insert([{
+                        group_id: currentGroup.id,
+                        settlement_data: currentSettlement,
+                        created_by: currentUser.id
+                    }]);
+
+                if (settlementError) throw settlementError;
+
+                alert('Settlement recorded successfully!');
+                
+                // Refresh views
+                loadCurrentBalances();
+                loadHistory();
+                
+                // Clear settlement
+                currentSettlement = null;
+                document.getElementById('settlementResult').innerHTML = '';
+                document.getElementById('settleActions').classList.add('hidden');
+
+            } catch (error) {
+                alert('Error recording settlement: ' + error.message);
+            }
+        }
+
+        async function loadHistory() {
+            try {
+                const { data: settlements, error } = await supabase
+                    .from('settlements')
+                    .select(`
+                        *,
+                        created_by_member:group_members!created_by(username)
+                    `)
+                    .eq('group_id', currentGroup.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const historyDiv = document.getElementById('historyList');
+                
+                if (settlements.length === 0) {
+                    historyDiv.innerHTML = '<div class="history-item">No settlement history yet.</div>';
+                    return;
+                }
+
+                const historyHtml = settlements.map(settlement => {
+                    const date = new Date(settlement.created_at).toLocaleString();
+                    const settlementsHtml = settlement.settlement_data.map(s => 
+                        `<div style="margin: 4px 0;"><strong>${s.fromName}</strong> → <strong>${s.toName}</strong>: PKR ${s.amount.toFixed(2)}</div>`
+                    ).join('');
+                    
+                    return `<div class="history-item">
+                        <div class="history-date">Settled on ${date} by ${settlement.created_by_member.username}</div>
+                        ${settlementsHtml}
+                    </div>`;
+                }).join('');
+
+                historyDiv.innerHTML = historyHtml;
+
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        function updateManageTab() {
+            const currentMembersDiv = document.getElementById('currentMembers');
+            
+            const membersHtml = groupMembers.map(member => {
+                const canRemove = currentUser.is_admin && member.id !== currentUser.id;
+                return `<div class="member-chip" style="justify-content: space-between; width: 100%; margin-bottom: 8px;">
+                    <span>${member.username} ${member.is_admin ? '(Admin)' : ''}</span>
+                    ${canRemove ? `<button class="remove-member" onclick="removeMemberFromGroup(${member.id})">×</button>` : ''}
+                </div>`;
+            }).join('');
+
+            currentMembersDiv.innerHTML = `
+                <h4 style="margin-bottom: 12px;">Current Members:</h4>
+                ${membersHtml}
+            `;
+        }
+
+        async function addNewMember() {
+            const memberName = document.getElementById('newMemberName').value.trim();
+            const errorDiv = document.getElementById('manageError');
+            const successDiv = document.getElementById('manageSuccess');
+            
+            errorDiv.textContent = '';
+            successDiv.textContent = '';
+
+            if (!memberName) {
+                errorDiv.textContent = 'Please enter a member name';
+                return;
+            }
+
+            if (groupMembers.some(member => member.username === memberName)) {
+                errorDiv.textContent = 'Member with this name already exists';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('group_members')
+                    .insert([{
+                        group_id: currentGroup.id,
+                        username: memberName,
+                        is_admin: false
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                groupMembers.push(data[0]);
+                updateDropdowns();
+                updateManageTab();
+                
+                document.getElementById('newMemberName').value = '';
+                successDiv.textContent = 'Member added successfully!';
+
+            } catch (error) {
+                errorDiv.textContent = 'Error adding member: ' + error.message;
+            }
+        }
+
+        async function removeMemberFromGroup(memberId) {
+            if (!currentUser.is_admin) {
+                alert('Only admins can remove members');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to remove this member?')) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('group_members')
+                    .delete()
+                    .eq('id', memberId);
+
+                if (error) throw error;
+
+                groupMembers = groupMembers.filter(member => member.id !== memberId);
+                updateDropdowns();
+                updateManageTab();
+                
+                document.getElementById('manageSuccess').textContent = 'Member removed successfully!';
+
+            } catch (error) {
+                document.getElementById('manageError').textContent = 'Error removing member: ' + error.message;
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('RoomLedger initialized');
+        });
+    </script>
+</body>
+</html>

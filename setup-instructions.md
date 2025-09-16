@@ -46,10 +46,24 @@ roomledger/
 
 ### Step 3: Configure Environment Variables
 
-#### For Netlify (Recommended):
+#### For Vercel Deployments
+
+1. Create GitHub repository with all files (or import an existing one)
+2. In the Vercel dashboard, click **Add New → Project** and import your repo
+3. After the first import, open **Project Settings → Environment Variables**
+4. Add the following keys for the environments you use (Production/Preview):
+
+```bash
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key-here
+```
+
+5. Click **Save**, then trigger a redeploy from the **Deployments** tab (⋯ → **Redeploy**) so the new variables are available
+
+#### For Netlify Deployments
 
 1. Create GitHub repository with all files
-2. Connect to Netlify
+2. Connect the repo to Netlify
 3. Go to **Site Settings** → **Environment Variables**
 4. Add these variables:
 
@@ -60,36 +74,45 @@ ENABLE_PYTHON_ALGORITHMS=true
 APP_ENV=production
 ```
 
+5. Save the variables and trigger a new deploy (push a commit or click **Trigger deploy** from the Deploys tab)
+
 #### Get Your Supabase Credentials:
 
 1. In Supabase: **Settings** → **API**
 2. Copy **Project URL** and **anon/public key**
-3. Add to Netlify environment variables
+3. Paste them into the environment variable fields above
 
-### Step 4: Deploy to Netlify
+### Step 4: Deploy to Netlify or Vercel
 
-#### Option A: GitHub Integration (Professional)
+#### Option A: Netlify via GitHub (Professional)
 
 1. Push your files to GitHub repository
 2. Connect Netlify to your GitHub repo
 3. Build settings auto-configured via `netlify.toml`
 4. Deploy automatically triggers
 
-#### Option B: Direct Upload
+#### Option B: Vercel via GitHub
+
+1. Import the repository into Vercel (Add New → Project)
+2. Keep the default **Framework Preset: Other** and leave build command/output directory blank for static hosting
+3. Deploy the project; Vercel serves `index.html` from the project root
+4. After deployment, confirm the `/api/get-config` endpoint returns JSON
+
+#### Option C: Netlify Direct Upload
 
 1. Zip all files maintaining folder structure
 2. Drag to Netlify deploy area
 3. Manual uploads require re-upload for updates
 
-### Step 5: Verify Python Functions
+### Step 5: Verify Serverless Functions
 
-After deployment, test the Python settlement API:
+- **Vercel**: open `https://your-app.vercel.app/api/get-config` to ensure Supabase credentials return (values will be blank if env vars missing)
+- **Netlify**: POST to `https://your-app.netlify.app/.netlify/functions/smart-settlement` with the payload below to exercise the Python settlement API
 
 ```bash
-# Test URL (replace with your Netlify domain)
+# Test payload for Netlify smart-settlement function
 POST https://your-app.netlify.app/.netlify/functions/smart-settlement
 
-# Test payload:
 {
   "balances": {"1": 100, "2": -50, "3": -50},
   "members": [
@@ -104,6 +127,7 @@ POST https://your-app.netlify.app/.netlify/functions/smart-settlement
 
 1. **Create Test Group**:
    - Register with your name + family members
+   - Give the room a friendly **Group Name** and choose the **Default Currency**
    - Use strong group password
    - Test login with different usernames
 

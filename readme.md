@@ -12,6 +12,7 @@ RoomLedger is a lightweight, mobile-friendly web app that helps families, roomma
 - **Settlement History**: Track all past settlements
 - **Flexible Expense Splitting**: Split bills between selected group members
 - **Real-time Balances**: See who owes what instantly
+- **Room Preferences**: Name your room and pick the currency that fits your household
 
 ## 📱 Example Scenario
 
@@ -25,40 +26,43 @@ RoomLedger is a lightweight, mobile-friendly web app that helps families, roomma
 
 ## 🛠 Quick Setup
 
-1. **Get the files**: Download the 3 files from this repository
+1. **Get the files**: Download the repository (keep folder structure intact)
 2. **Setup Supabase**: Create free project and run the database schema
-3. **Update config**: Add your Supabase credentials to index.html
-4. **Deploy**: Push to GitHub and connect to Netlify (or direct upload)
+3. **Update config**: Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to your hosting environment variables (Vercel or Netlify)
+4. **Deploy**: Push to GitHub and connect to Vercel/Netlify (or use their manual upload/import flows)
 
 **Detailed setup instructions**: See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
 
 ## 📁 Repository Files
 
 ```
-├── index.html              # Main application (update with your Supabase config)
+├── index.html              # Main application (reads Supabase config at runtime)
+├── styles.css              # Mobile-first styling
+├── api/get-config.js       # Vercel function exposing environment variables
+├── netlify/functions/      # Netlify functions (config + Python settlement)
 ├── netlify.toml            # Netlify deployment configuration
-├── database_schema.sql     # Supabase database setup
+├── SUPABASE_SETUP.md       # Secure Supabase configuration guide
 ├── SETUP_INSTRUCTIONS.md   # Detailed setup guide
-└── README.md              # This file
+└── README.md               # This file
 ```
 
 ## 🌐 Live Demo
 
-After setup, your app will be available at your Netlify URL (like `https://your-app.netlify.app`)
+After setup, your app will be available at your hosting URL (for example `https://your-app.vercel.app` or `https://your-app.netlify.app`).
 
 ## 🎯 How It Works
 
-1. **Create Group**: One person registers and adds family/roommate names
+1. **Create Group**: One person registers, names the shared room, chooses a currency, and adds family/roommate names
 2. **Shared Access**: Everyone uses the same group password to login
 3. **Track Expenses**: Anyone can add expenses and split them
 4. **Smart Settlement**: App calculates the minimum payments needed
-5. **Record & Repeat**: Confirm settlements and maintain history
+5. **Record & Repeat**: Confirm settlements, tweak settings anytime, and maintain history
 
 ## 🔧 Tech Stack
 
 - **Frontend**: Vanilla HTML/CSS/JavaScript
 - **Backend**: Supabase (PostgreSQL)
-- **Hosting**: Netlify
+- **Hosting**: Vercel or Netlify
 - **Authentication**: Simple shared password system
 
 ## 📊 Smart Algorithm Example

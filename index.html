@@ -985,6 +985,8 @@
                 if (appSection) {
                     appSection.classList.remove('hidden');
                     appSection.style.display = 'block';
+                    appSection.style.visibility = 'visible';
+                    appSection.style.opacity = '1';
                 }
                 
                 console.log('Auth section hidden, app section shown');
@@ -1005,6 +1007,31 @@
                 if (debugGroup) debugGroup.textContent = currentGroup ? currentGroup.name : 'Not set';
                 if (debugMembers) debugMembers.textContent = groupMembers ? groupMembers.length : 'Not set';
                 if (debugSupabase) debugSupabase.textContent = supabase ? 'Connected' : 'Not connected';
+
+                // Force show dashboard tab content explicitly as a fallback
+                const dashboardTab = document.getElementById('dashboardTab');
+                if (dashboardTab) {
+                    dashboardTab.classList.add('active');
+                    dashboardTab.style.display = 'block';
+                    dashboardTab.style.visibility = 'visible';
+                    dashboardTab.style.opacity = '1';
+                }
+                const addDebtTab = document.getElementById('addDebtTab');
+                if (addDebtTab) addDebtTab.style.display = 'none';
+                const settleTab = document.getElementById('settleTab');
+                if (settleTab) settleTab.style.display = 'none';
+                const historyTab = document.getElementById('historyTab');
+                if (historyTab) historyTab.style.display = 'none';
+                const manageTab = document.getElementById('manageTab');
+                if (manageTab) manageTab.style.display = 'none';
+
+                // Ensure the wrapper card is visible
+                const appCard = appSection ? appSection.querySelector('.card') : null;
+                if (appCard) {
+                    appCard.style.display = 'block';
+                    appCard.style.visibility = 'visible';
+                    appCard.style.opacity = '1';
+                }
 
                 // Initialize all app components
                 updateCurrencyDisplay();

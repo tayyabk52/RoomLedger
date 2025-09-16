@@ -1,58 +1,56 @@
 # 🔧 Secure Supabase Setup Guide
 
-## 🔒 **Security-First Approach**
+Follow the steps below to keep your Supabase credentials safe while deploying RoomLedger on **Vercel** or **Netlify**.
 
-Your Supabase credentials are now loaded **securely** from your Vercel project environment variables, not hardcoded in the client-side code.
+## 1. Grab Your Supabase Credentials
 
-## Quick Setup (2 minutes)
-
-### Step 1: Get Your Supabase Credentials
-
-1. **Go to your Supabase project**: https://supabase.com/dashboard
-2. **Click "Settings" (gear icon)** in the left sidebar
-3. **Click "API"**
-4. **Copy these values:**
-   - **Project URL** (looks like: `https://your-project-id.supabase.co`)
+1. Sign in at [supabase.com](https://supabase.com/dashboard).
+2. Select your project and open **Settings → API**.
+3. Copy the following values:
+   - **Project URL** (looks like `https://xyzcompany.supabase.co`)
    - **Anon public key** (starts with `eyJ...`)
 
-### Step 2: Set Vercel Environment Variables
+## 2. Configure Environment Variables
 
-1. **Open the Vercel Dashboard** → select your RoomLedger project
-2. Go to **Settings** → **Environment Variables**
-3. Click **"Add"** twice and create:
+You only need to set two variables: `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
 
-   - `SUPABASE_URL` → paste the Supabase Project URL
-   - `SUPABASE_ANON_KEY` → paste the anon public key
+### If you deploy on Vercel
+1. Open your project in the Vercel dashboard.
+2. Go to **Settings → Environment Variables**.
+3. Add the two keys above for the environments you use (Production/Preview).
+4. Click **Save**.
 
-4. Choose the correct environment (Production/Preview) and click **Save**
-5. Trigger a new deployment (**Deployments** tab → **Redeploy** latest)
+### If you deploy on Netlify
+1. Open **Site configuration → Build & deploy → Environment**.
+2. Add `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+3. Click **Save**.
 
-### Step 3: Deploy / Redeploy
+> 💡 Tip: Netlify also supports per-branch variables if you want different Supabase projects for preview builds.
 
-- **Git-based workflow**: commit & push (`git add . && git commit && git push`) to trigger a fresh build
-- **Manual redeploy**: use the hosting dashboard’s redeploy button after editing environment variables
+## 3. Redeploy After Updating Variables
 
-### Step 4: Test
+- **Vercel** – Trigger a redeploy from **Deployments → Redeploy** or push a new git commit.
+- **Netlify** – Use **Deploys → Trigger deploy → Deploy site** or push a new git commit.
 
-1. **Open your deployed site**
-2. **Check browser console** - should see "✅ Supabase client initialized successfully"
-3. **Try creating a group** - it should work!
+Redeploying ensures the serverless functions pick up the new credentials.
 
-## 🔒 **Security Benefits**
+## 4. Smoke-Test the Configuration
 
-✅ **No hardcoded credentials** in client-side code  
-✅ **Environment variables** stored securely on your hosting provider
-✅ **Server-side loading** of sensitive data
-✅ **Automatic redeploy** when you update env vars
+1. Visit your deployed site and check the browser console – you should see `✅ Supabase client initialized successfully`.
+2. Fetch the config endpoint manually:
+   - Vercel: `https://<your-vercel-domain>/api/get-config`
+   - Netlify: `https://<your-netlify-domain>/.netlify/functions/get-config`
+3. Create a test group in the UI and ensure login + expense creation work.
 
-## 🚨 Troubleshooting
+## 5. Troubleshooting Checklist
 
-**Still seeing errors?**
-- Double-check environment variable names (exactly `SUPABASE_URL` and `SUPABASE_ANON_KEY`)
-- Make sure the values are correct (no extra spaces)
-- Wait for the new deployment to complete
-- Clear browser cache and refresh
+- Double-check variable names are exactly `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+- Make sure there are no trailing spaces when pasting values.
+- Confirm you redeployed after updating environment variables.
+- If errors persist, open your hosting logs:
+  - Vercel: **Project → Deployments → View Functions Logs**.
+  - Netlify: **Site configuration → Functions → Logs**.
+- Verify the Supabase project is running and that the database schema has been applied.
 
-**Need help?**
-- **Vercel**: Check the **Deployments logs** for `/api/get-config`
-- Verify your project is active in Supabase
+With the variables in place, RoomLedger will securely talk to Supabase from either hosting provider. ✅
+

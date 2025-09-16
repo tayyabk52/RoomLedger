@@ -1,253 +1,92 @@
 # RoomLedger Professional Setup Guide
 
-## 📁 Complete File Structure
+Follow this guide to configure Supabase, deploy RoomLedger, and verify that everything is working on both **Vercel** and **Netlify**.
 
-Download all these files and maintain this exact structure:
+## 📁 File Structure
 
 ```
 roomledger/
-├── index.html                                    # Main application
-├── styles.css                                    # Professional styling
+├── index.html
+├── styles.css
 ├── api/
-│   ├── get-config.js                             # Vercel config bridge
-│   └── smart-settlement.js                       # Advanced settlement algorithms
-├── database_schema.sql                           # Enhanced database setup
-├── SETUP_INSTRUCTIONS.md                         # This file
-├── README.md                                     # Project overview
-├── DEPLOYMENT_FIXES.md                           # Troubleshooting notes
-├── SUPABASE_SETUP.md                             # Supabase credential guide
-├── TEST_SCENARIO.md                              # Manual testing script
-└── package.json                                  # Package information
+│   ├── get-config.js
+│   └── smart-settlement.js
+├── netlify/
+│   └── functions/
+│       ├── get-config.js
+│       ├── smart-settlement.py
+│       └── requirements.txt
+├── netlify.toml
+├── database_schema.sql
+├── SUPABASE_SETUP.md
+├── DEPLOYMENT_FIXES.md
+├── TEST_SCENARIO.md
+└── setup-instructions.md
 ```
 
-## 🚀 Professional Deployment Guide
+## 🚀 Deployment Workflow
 
-### Step 1: Create Supabase Project (5 minutes)
+### Step 1 – Create a Supabase Project
+1. Visit [supabase.com](https://supabase.com) and create a new project.
+2. Choose a strong database password and region close to your users.
+3. Wait for initialization to finish.
 
-1. Go to [supabase.com](https://supabase.com) and create account
-2. Click **"New Project"**
-3. Enter project details:
-   - **Name**: RoomLedger-Production
-   - **Database Password**: (generate strong password)
-   - **Region**: Choose closest to your users
-4. Wait for project initialization
+### Step 2 – Apply the Database Schema
+1. Open **SQL Editor** in Supabase.
+2. Create a **New query** and paste the contents of `database_schema.sql`.
+3. Run the query and confirm all tables, views, and triggers were created successfully.
 
-### Step 2: Setup Enhanced Database Schema
+### Step 3 – Configure Environment Variables
+Collect the **Project URL** and **Anon public key** from **Settings → API** in Supabase, then set the following variables on your host:
 
-1. Navigate to **SQL Editor** in Supabase dashboard
-2. Create **New Query**
-3. Copy and paste the entire `database_schema.sql` content
-4. Click **"RUN"** to execute
-5. Verify tables created successfully:
-   - ✅ groups, group_members, transactions, settlements
-   - ✅ expense_categories, recurring_expenses, notifications
-   - ✅ audit_log, group_invites (future features)
-   - ✅ Views: member_balances, recent_activity
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
-### Step 3: Configure Environment Variables (Vercel)
+**Vercel:** Project → Settings → Environment Variables → Add the keys → Save.
+**Netlify:** Site configuration → Build & deploy → Environment → Add the keys → Save.
 
-1. Create GitHub repository with all files (or import an existing one)
-2. In the Vercel dashboard, click **Add New → Project** and import your repo
-3. After the first import, open **Project Settings → Environment Variables**
-4. Add the following keys for the environments you use (Production/Preview):
+Remember to redeploy after updating environment variables so serverless functions pick up the new values.
 
-```bash
-SUPABASE_URL=https://your-project-id.supabase.co
-SUPABASE_ANON_KEY=your-supabase-anon-key-here
-```
+### Step 4 – Deploy the Frontend & Functions
+- **Vercel**
+  1. Import the repository (framework preset: **Other**).
+  2. No build command needed – the site is static.
+  3. Deploy and wait for `api/get-config` to return JSON.
 
-5. Click **Save**, then trigger a redeploy from the **Deployments** tab (⋯ → **Redeploy**) so the new variables are available
+- **Netlify**
+  1. Drag & drop the folder or connect the repository.
+  2. `netlify.toml` automatically configures redirects and Python runtime.
+  3. After deploy, test `/.netlify/functions/get-config` to ensure credentials resolve.
 
-#### Get Your Supabase Credentials:
+### Step 5 – Verify Serverless APIs
+Use your live domain (replace `<host>` with your actual domain):
 
-1. In Supabase: **Settings** → **API**
-2. Copy **Project URL** and **anon/public key**
-3. Paste them into the environment variable fields above
+- Config endpoint: `https://<host>/api/get-config` (Vercel) or `https://<host>/.netlify/functions/get-config` (Netlify)
+- Smart settlement endpoint: `https://<host>/api/smart-settlement`
+  - On Netlify the `/api/*` path is proxied to the Python function by `netlify.toml`.
 
-### Step 4: Deploy to Vercel
+You can also POST the example payload from `TEST_SCENARIO.md` to confirm the advanced algorithm works end-to-end.
 
-1. Push your files to GitHub (or ensure the repo stays up to date)
-2. In Vercel, click **Add New → Project** and import the repository
-3. Use the default **Framework Preset: Other** so Vercel serves the static `index.html`
-4. Leave build command and output directory blank (static export)
-5. Deploy the project and wait for the first build to finish
-6. After deployment, confirm the `/api/get-config` endpoint returns JSON
+### Step 6 – Run Through the App
+1. Register a new group with name, password, and default currency.
+2. Invite roommates and verify they can log in.
+3. Add a mix of expenses (different payers, participants, and currencies).
+4. Click **Generate Smart Settlement** – ensure results populate and history records update.
+5. Test member management actions in the **Manage** tab.
 
-### Step 5: Verify Serverless Functions
+## 🎨 Included Enhancements
 
-- Open `https://your-app.vercel.app/api/get-config` to ensure Supabase credentials return (values will be blank if env vars missing)
-- POST to `https://your-app.vercel.app/api/smart-settlement` with the payload below to exercise the advanced settlement API
+- Modern, mobile-first UI with smooth interactions and status messaging.
+- Advanced serverless settlement engine with algorithm selection and metrics.
+- Secure Supabase integration with automatic environment detection for Vercel/Netlify.
+- Extensive database schema featuring categories, recurring expenses, notifications, and audit logging (ready for future upgrades).
 
-```bash
-# Test payload for Vercel smart-settlement function
-POST https://your-app.vercel.app/api/smart-settlement
+## 🔍 Troubleshooting
 
-{
-  "balances": {"1": 100, "2": -50, "3": -50},
-  "members": [
-    {"id": 1, "username": "Alice"},
-    {"id": 2, "username": "Bob"},
-    {"id": 3, "username": "Charlie"}
-  ]
-}
-```
+- **Supabase errors**: confirm environment variables and rerun `database_schema.sql`.
+- **Config endpoint fails**: check hosting logs (Vercel functions logs or Netlify function logs) for missing env variables.
+- **Smart settlement fallback**: if serverless endpoints fail, the frontend uses the built-in JS algorithm—investigate server logs for root causes.
+- **CORS issues on custom domains**: Netlify headers in `netlify.toml` allow cross-origin requests from the app domain; adjust if you proxy through another service.
 
-### Step 6: App Configuration & Testing
+With these steps complete, your RoomLedger deployment will be conflict-free and ready for real-world roommate expense tracking. ✅
 
-1. **Create Test Group**:
-   - Register with your name + family members
-   - Give the room a friendly **Group Name** and choose the **Default Currency**
-   - Use strong group password
-   - Test login with different usernames
-
-2. **Test Core Features**:
-   - ✅ Add expenses with different split configurations
-   - ✅ Verify smart settlement calculations
-   - ✅ Check settlement history preservation
-   - ✅ Test member management (add/remove)
-
-3. **Verify Advanced Features**:
-   - ✅ Advanced settlement API integration (check console for "Advanced settlement" logs)
-   - ✅ Professional UI animations and interactions
-   - ✅ Mobile responsiveness
-   - ✅ Performance metrics in settlement results
-
-## 🎨 Professional Features Included
-
-### **Enhanced UI/UX**
-- **Modern Design System**: Professional color palette, typography, spacing
-- **Smooth Animations**: Micro-interactions, loading states, hover effects
-- **Mobile-First**: Responsive design optimized for all devices
-- **Loading States**: Professional feedback for all async operations
-
-### **Advanced Settlement Engine**
-- **Multiple Algorithms**: Greedy Heap, Min-Max Flow, Balanced Partition
-- **Algorithm Selection**: Automatically chooses optimal approach
-- **Performance Metrics**: Shows computation time, efficiency gains
-- **Fallback System**: Client-side JavaScript backup if the serverless API is unavailable
-
-### **Enterprise-Ready Database**
-- **Audit Logging**: Complete change tracking
-- **Future-Proof Schema**: Categories, recurring expenses, notifications
-- **Performance Optimized**: Indexes, views, triggers
-- **Data Integrity**: Foreign keys, constraints, validation
-
-### **Production Architecture**
-- **Environment Variables**: Secure configuration management
-- **CORS Support**: Proper API access controls
-- **Error Handling**: Comprehensive error management
-- **Security Headers**: CSP, XSS protection, HTTPS enforcement
-
-## 🔧 Advanced Configuration
-
-### Serverless Algorithm Customization
-
-Edit `api/smart-settlement.js` to:
-- Add new settlement algorithms
-- Integrate external optimization libraries
-- Customize efficiency calculations
-- Add machine learning predictions
-
-### Database Extensions
-
-The schema includes tables for future features:
-- **Categories**: Expense categorization and analytics
-- **Recurring Expenses**: Automated recurring bill handling
-- **Notifications**: Real-time user notifications
-- **Audit Log**: Complete change tracking
-
-## 📊 Monitoring & Analytics
-
-### Performance Monitoring
-- Settlement algorithm performance metrics
-- API response times
-- Database query optimization
-- User interaction tracking
-
-### Business Intelligence
-- Group usage patterns
-- Settlement efficiency improvements
-- Popular expense categories
-- User engagement metrics
-
-## 🔒 Security Features
-
-### Data Protection
-- Row Level Security (RLS) enabled
-- Environment variable security
-- SQL injection prevention
-- XSS protection headers
-
-### Access Control
-- Group-based data isolation
-- Admin permission system
-- Audit trail maintenance
-- Session management
-
-## 🚧 Future Roadmap
-
-### Phase 2 Features (Ready to Enable)
-- **Expense Categories**: Smart categorization and analytics
-- **Recurring Expenses**: Automated bill management
-- **Push Notifications**: Real-time updates
-- **Advanced Analytics**: Spending insights and trends
-
-### Phase 3 Enhancements
-- **Mobile Apps**: Native iOS/Android applications
-- **Bank Integration**: Automatic transaction import
-- **AI Predictions**: Smart expense forecasting
-- **Multi-Currency**: International group support
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-**❌ Environment Variables Not Loading**
-- Verify exact variable names in Vercel settings
-- Check for typos in Supabase URL/key
-- Ensure no trailing spaces in values
-
-**❌ Advanced Settlement API Not Working**
-- Check Vercel deployment logs for `/api/smart-settlement`
-- Verify the `api/` folder contains both `get-config.js` and `smart-settlement.js`
-- Test with the sample payload shown above
-
-**❌ Database Connection Errors**
-- Verify Supabase project is active
-- Check RLS policies are properly set
-- Ensure database schema executed completely
-
-**❌ Settlement Calculations Wrong**
-- Test with simple 2-person scenario first
-- Check browser console for JavaScript errors
-- Verify member IDs are consistent
-
-### Performance Optimization
-
-**Database Performance**:
-- Indexes automatically created for optimal queries
-- Use member_balances view for quick balance lookups
-- Archive old settlements periodically
-
-**Frontend Performance**:
-- CSS animations use hardware acceleration
-- Lazy loading for large transaction lists
-- Optimized API calls with caching
-
-### Security Hardening
-
-**Production Checklist**:
-- ✅ Environment variables in Vercel (never in code)
-- ✅ HTTPS enforced via Vercel
-- ✅ Security headers configured
-- ✅ RLS policies active
-- ✅ Input validation implemented
-
-## 📞 Support Resources
-
-- **Database Issues**: Supabase Dashboard → Logs
-- **Function Issues**: Vercel Deployments → View Function Logs
-- **Frontend Issues**: Browser Console (F12)
-- **Performance**: Vercel Analytics Dashboard
-
-The application is production-ready with enterprise-grade features, security, and scalability built-in from day one!

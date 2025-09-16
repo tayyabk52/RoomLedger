@@ -1,99 +1,100 @@
 # 💰 RoomLedger
 
-**Smart debt tracking for families & roommates**
+**Smart debt tracking for roommates, friends, and families.**
 
-RoomLedger is a lightweight, mobile-friendly web app that helps families, roommates, and shared households track informal debts and settle them efficiently.
+RoomLedger is a lightweight, mobile-friendly web app that helps shared households track informal debts, settle them efficiently, and stay transparent about who owes what.
 
 ## 🚀 Key Features
 
-- **Smart Settlement Algorithm**: Reduces multiple transactions into minimum payments
-- **Simple Group Management**: One person creates, everyone joins with shared password
-- **Mobile-First Design**: Works perfectly on phones and tablets
-- **Settlement History**: Track all past settlements
-- **Flexible Expense Splitting**: Split bills between selected group members
-- **Real-time Balances**: See who owes what instantly
-- **Room Preferences**: Name your room and pick the currency that fits your household
+- **Smart Settlement Algorithm** – Reduces many transactions into a handful of optimal payments.
+- **Flexible Group Management** – Create a room, invite members, and choose who participates in each bill.
+- **Mobile-First Design** – Built for phones first with responsive layouts and large touch targets.
+- **Settlement History** – Keep a record of previous settlements and running balances.
+- **Currency Aware** – Pick the currency that matches your room; all totals adapt instantly.
+- **Hosting Flexibility** – Works on both Vercel (Node) and Netlify (Python) serverless runtimes.
 
 ## 📱 Example Scenario
 
-**Jim, Alex, Tim, and Ali go out:**
-- Jim pays ₹500 for Uber
-- Alex pays ₹600 for dinner
-- Tim pays ₹200 for drinks
-- Tim pays ₹350 for return Uber
+**Five roommates, two nights out:**
+- Night 1: Three friends go out. Two pay unequal amounts, one pays later.
+- Night 2: All five go out and three cover the bill unevenly.
 
-**Instead of 6 separate transactions**, RoomLedger calculates just **2 optimal payments** to settle everyone!
+Instead of juggling spreadsheets, RoomLedger tracks every transaction, calculates net balances, and produces the minimum number of repayments required to make everyone whole.
 
 ## 🛠 Quick Setup
 
-1. **Get the files**: Download the repository (keep folder structure intact)
-2. **Setup Supabase**: Create free project and run the database schema
-3. **Update config**: Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to your Vercel project environment variables
-4. **Deploy**: Push to GitHub and connect to Vercel (or redeploy from the dashboard)
+1. **Get the files** – Clone or download this repository.
+2. **Create Supabase project** – Run `database_schema.sql` inside the Supabase SQL editor.
+3. **Add Supabase credentials to your host**:
+   - **Vercel:** Project → Settings → Environment Variables → add `SUPABASE_URL` & `SUPABASE_ANON_KEY`.
+   - **Netlify:** Site configuration → Build & deploy → Environment → add the same two variables.
+4. **Deploy**:
+   - **Vercel:** Connect the repo or run `vercel --prod`; verify `/api/get-config` returns JSON.
+   - **Netlify:** Push to the linked repo or trigger a deploy in the UI; confirm `/.netlify/functions/get-config` works.
 
-**Detailed setup instructions**: See [setup-instructions.md](setup-instructions.md)
+Need more detail? See [setup-instructions.md](setup-instructions.md) and [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 
 ## 📁 Repository Files
 
 ```
-├── index.html              # Main application (reads Supabase config at runtime)
-├── styles.css              # Mobile-first styling
+├── index.html                # Main application (Supabase client + UI)
+├── styles.css                # Mobile-first styling
 ├── api/
-│   ├── get-config.js       # Serverless function exposing environment variables
-│   └── smart-settlement.js # Advanced settlement engine (Vercel function)
-├── database_schema.sql     # Full Supabase schema for the app
-├── SUPABASE_SETUP.md       # Secure Supabase configuration guide
-├── setup-instructions.md   # Detailed setup guide
-├── DEPLOYMENT_FIXES.md     # Common deployment troubleshooting notes
-├── TEST_SCENARIO.md        # End-to-end manual testing scenario
-└── README.md               # This file
+│   ├── get-config.js         # Vercel function exposing Supabase credentials
+│   └── smart-settlement.js   # Node-based advanced settlement engine
+├── netlify/
+│   └── functions/
+│       ├── get-config.js     # Netlify function exposing Supabase credentials
+│       ├── smart-settlement.py  # Python advanced settlement engine
+│       └── requirements.txt  # Python dependencies (standard library)
+├── netlify.toml              # Netlify redirects, headers, and runtime config
+├── database_schema.sql       # Full Supabase schema for RoomLedger
+├── SUPABASE_SETUP.md         # Secure Supabase environment configuration
+├── setup-instructions.md     # Deployment & QA checklist
+├── DEPLOYMENT_FIXES.md       # Summary of deployment-related fixes
+├── TEST_SCENARIO.md          # Manual end-to-end testing scenario
+└── README.md                 # You are here
 ```
 
-## 🌐 Live Demo
+## 🌐 Live Deployment
 
-After setup, your app will be available at your hosting URL (for example `https://your-app.vercel.app`).
+After deploying to Vercel or Netlify, your app will be available at `https://<your-domain>/`. Test `/api/get-config` (Vercel) or `/.netlify/functions/get-config` (Netlify) if you need to verify credentials quickly.
 
 ## 🎯 How It Works
 
-1. **Create Group**: One person registers, names the shared room, chooses a currency, and adds family/roommate names
-2. **Shared Access**: Everyone uses the same group password to login
-3. **Track Expenses**: Anyone can add expenses and split them
-4. **Smart Settlement**: App calculates the minimum payments needed
-5. **Record & Repeat**: Confirm settlements, tweak settings anytime, and maintain history
+1. **Create Group** – Register a room name, currency, and shared password.
+2. **Join Group** – Roommates log in with the shared credentials.
+3. **Track Expenses** – Select who participated, who paid, and the amount.
+4. **Smart Settlement** – Generate optimized payments to settle the room.
+5. **Record & Repeat** – Close settlements, revisit history, and manage members anytime.
 
 ## 🔧 Tech Stack
 
-- **Frontend**: Vanilla HTML/CSS/JavaScript
-- **Backend**: Supabase (PostgreSQL)
-- **Hosting**: Vercel (static hosting + serverless functions)
-- **Authentication**: Simple shared password system
+- **Frontend:** Vanilla HTML, CSS, and JavaScript (Supabase JS SDK v2).
+- **Backend:** Supabase (PostgreSQL + Row Level Security).
+- **Serverless:** Node.js functions for Vercel, Python/Node functions for Netlify.
+- **Hosting:** Vercel or Netlify – pick the provider that fits your workflow.
 
 ## 📊 Smart Algorithm Example
 
-**Traditional way**: 4 people = up to 12 possible transactions  
-**RoomLedger way**: Same 4 people = usually just 2-3 payments needed
-
-The app automatically calculates the optimal payment flow to settle all debts with minimum transactions.
+Traditional four-person split = up to 12 payments. RoomLedger usually reduces that to 2–3 payments by matching creditors and debtors intelligently.
 
 ## 🔒 Privacy & Security
 
-- All data stored securely in Supabase
-- Row Level Security enabled
-- Simple authentication designed for trusted groups
-- No complex user management needed
+- Data lives inside your Supabase project.
+- RLS policies protect room data per group.
+- No personal data leaves your control.
+- Simple shared password model keeps onboarding friction-free for trusted roommates.
 
-## 📈 Future Features
+## 📈 Future Ideas
 
-- Recurring expenses
-- Category-based spending analysis
-- Export settlement history
-- Group spending insights
-- Mobile app versions
+- Recurring expenses & reminders
+- Spending analytics and dashboards
+- CSV/Excel export
+- Push/email notifications
+- Native mobile apps
 
 ## 📝 License
 
 This project is open source and available under the MIT License.
 
----
-
-**Ready to deploy?** Check out [setup-instructions.md](setup-instructions.md) for the complete guide!

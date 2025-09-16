@@ -2,7 +2,7 @@
 
 ## 🔒 **Security-First Approach**
 
-Your Supabase credentials are now loaded **securely** from Netlify environment variables, not hardcoded in the client-side code.
+Your Supabase credentials are now loaded **securely** from your Vercel project environment variables, not hardcoded in the client-side code.
 
 ## Quick Setup (2 minutes)
 
@@ -15,33 +15,22 @@ Your Supabase credentials are now loaded **securely** from Netlify environment v
    - **Project URL** (looks like: `https://your-project-id.supabase.co`)
    - **Anon public key** (starts with `eyJ...`)
 
-### Step 2: Set Netlify Environment Variables
+### Step 2: Set Vercel Environment Variables
 
-1. **Go to your Netlify dashboard**
-2. **Click on your RoomLedger site**
-3. **Go to "Site settings" (gear icon)**
-4. **Click on "Environment variables"**
-5. **Add these variables:**
+1. **Open the Vercel Dashboard** → select your RoomLedger project
+2. Go to **Settings** → **Environment Variables**
+3. Click **"Add"** twice and create:
 
-   **Variable 1:**
-   - **Key:** `SUPABASE_URL`
-   - **Value:** Your Supabase project URL
-   - **Scope:** Production
+   - `SUPABASE_URL` → paste the Supabase Project URL
+   - `SUPABASE_ANON_KEY` → paste the anon public key
 
-   **Variable 2:**
-   - **Key:** `SUPABASE_ANON_KEY`
-   - **Value:** Your Supabase anon public key
-   - **Scope:** Production
+4. Choose the correct environment (Production/Preview) and click **Save**
+5. Trigger a new deployment (**Deployments** tab → **Redeploy** latest)
 
-### Step 3: Deploy
+### Step 3: Deploy / Redeploy
 
-1. **Commit and push** your changes:
-   ```bash
-   git add .
-   git commit -m "Add secure environment variable loading"
-   git push
-   ```
-2. **Wait for Netlify** to deploy automatically
+- **Git-based workflow**: commit & push (`git add . && git commit && git push`) to trigger a fresh build
+- **Manual redeploy**: use the hosting dashboard’s redeploy button after editing environment variables
 
 ### Step 4: Test
 
@@ -52,9 +41,9 @@ Your Supabase credentials are now loaded **securely** from Netlify environment v
 ## 🔒 **Security Benefits**
 
 ✅ **No hardcoded credentials** in client-side code  
-✅ **Environment variables** stored securely on Netlify  
-✅ **Server-side loading** of sensitive data  
-✅ **Automatic deployment** when you update env vars  
+✅ **Environment variables** stored securely on your hosting provider
+✅ **Server-side loading** of sensitive data
+✅ **Automatic redeploy** when you update env vars
 
 ## 🚨 Troubleshooting
 
@@ -65,5 +54,5 @@ Your Supabase credentials are now loaded **securely** from Netlify environment v
 - Clear browser cache and refresh
 
 **Need help?**
-- Check Netlify function logs for `/api/get-config` errors
-- Verify your project is active in Supabase 
+- **Vercel**: Check the **Deployments logs** for `/api/get-config`
+- Verify your project is active in Supabase

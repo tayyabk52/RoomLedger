@@ -18,8 +18,10 @@
 1. **Go to RoomLedger app**
 2. **Click "Create Group"**
 3. **Fill in details:**
+   - **Group Name:** Room 101
    - **Admin Name:** Ali
    - **Group Password:** roommates2024
+   - **Default Currency:** PKR — Pakistani Rupee
 4. **Add Members:**
    - Sara
    - Ahmed  

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx serve .",
     "dev": "npx live-server .",
-    "deploy": "netlify deploy --prod"
+    "deploy": "vercel --prod"
   },
   "keywords": [
     "debt-tracker",

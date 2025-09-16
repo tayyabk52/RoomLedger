@@ -8,15 +8,15 @@ Download all these files and maintain this exact structure:
 roomledger/
 ├── index.html                                    # Main application
 ├── styles.css                                    # Professional styling
-├── netlify.toml                                  # Deployment configuration
-├── .env                                          # Environment variables template
+├── api/
+│   ├── get-config.js                             # Vercel config bridge
+│   └── smart-settlement.js                       # Advanced settlement algorithms
 ├── database_schema.sql                           # Enhanced database setup
-├── netlify/
-│   └── functions/
-│       ├── smart-settlement.py                   # Python algorithms
-│       └── requirements.txt                      # Python dependencies
 ├── SETUP_INSTRUCTIONS.md                         # This file
 ├── README.md                                     # Project overview
+├── DEPLOYMENT_FIXES.md                           # Troubleshooting notes
+├── SUPABASE_SETUP.md                             # Supabase credential guide
+├── TEST_SCENARIO.md                              # Manual testing script
 └── package.json                                  # Package information
 ```
 
@@ -44,52 +44,44 @@ roomledger/
    - ✅ audit_log, group_invites (future features)
    - ✅ Views: member_balances, recent_activity
 
-### Step 3: Configure Environment Variables
+### Step 3: Configure Environment Variables (Vercel)
 
-#### For Netlify (Recommended):
-
-1. Create GitHub repository with all files
-2. Connect to Netlify
-3. Go to **Site Settings** → **Environment Variables**
-4. Add these variables:
+1. Create GitHub repository with all files (or import an existing one)
+2. In the Vercel dashboard, click **Add New → Project** and import your repo
+3. After the first import, open **Project Settings → Environment Variables**
+4. Add the following keys for the environments you use (Production/Preview):
 
 ```bash
 SUPABASE_URL=https://your-project-id.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key-here
-ENABLE_PYTHON_ALGORITHMS=true
-APP_ENV=production
 ```
+
+5. Click **Save**, then trigger a redeploy from the **Deployments** tab (⋯ → **Redeploy**) so the new variables are available
 
 #### Get Your Supabase Credentials:
 
 1. In Supabase: **Settings** → **API**
 2. Copy **Project URL** and **anon/public key**
-3. Add to Netlify environment variables
+3. Paste them into the environment variable fields above
 
-### Step 4: Deploy to Netlify
+### Step 4: Deploy to Vercel
 
-#### Option A: GitHub Integration (Professional)
+1. Push your files to GitHub (or ensure the repo stays up to date)
+2. In Vercel, click **Add New → Project** and import the repository
+3. Use the default **Framework Preset: Other** so Vercel serves the static `index.html`
+4. Leave build command and output directory blank (static export)
+5. Deploy the project and wait for the first build to finish
+6. After deployment, confirm the `/api/get-config` endpoint returns JSON
 
-1. Push your files to GitHub repository
-2. Connect Netlify to your GitHub repo
-3. Build settings auto-configured via `netlify.toml`
-4. Deploy automatically triggers
+### Step 5: Verify Serverless Functions
 
-#### Option B: Direct Upload
-
-1. Zip all files maintaining folder structure
-2. Drag to Netlify deploy area
-3. Manual uploads require re-upload for updates
-
-### Step 5: Verify Python Functions
-
-After deployment, test the Python settlement API:
+- Open `https://your-app.vercel.app/api/get-config` to ensure Supabase credentials return (values will be blank if env vars missing)
+- POST to `https://your-app.vercel.app/api/smart-settlement` with the payload below to exercise the advanced settlement API
 
 ```bash
-# Test URL (replace with your Netlify domain)
-POST https://your-app.netlify.app/.netlify/functions/smart-settlement
+# Test payload for Vercel smart-settlement function
+POST https://your-app.vercel.app/api/smart-settlement
 
-# Test payload:
 {
   "balances": {"1": 100, "2": -50, "3": -50},
   "members": [
@@ -104,6 +96,7 @@ POST https://your-app.netlify.app/.netlify/functions/smart-settlement
 
 1. **Create Test Group**:
    - Register with your name + family members
+   - Give the room a friendly **Group Name** and choose the **Default Currency**
    - Use strong group password
    - Test login with different usernames
 
@@ -114,7 +107,7 @@ POST https://your-app.netlify.app/.netlify/functions/smart-settlement
    - ✅ Test member management (add/remove)
 
 3. **Verify Advanced Features**:
-   - ✅ Python algorithm integration (check console for "Python API" messages)
+   - ✅ Advanced settlement API integration (check console for "Advanced settlement" logs)
    - ✅ Professional UI animations and interactions
    - ✅ Mobile responsiveness
    - ✅ Performance metrics in settlement results
@@ -131,7 +124,7 @@ POST https://your-app.netlify.app/.netlify/functions/smart-settlement
 - **Multiple Algorithms**: Greedy Heap, Min-Max Flow, Balanced Partition
 - **Algorithm Selection**: Automatically chooses optimal approach
 - **Performance Metrics**: Shows computation time, efficiency gains
-- **Fallback System**: JavaScript backup if Python API unavailable
+- **Fallback System**: Client-side JavaScript backup if the serverless API is unavailable
 
 ### **Enterprise-Ready Database**
 - **Audit Logging**: Complete change tracking
@@ -147,9 +140,9 @@ POST https://your-app.netlify.app/.netlify/functions/smart-settlement
 
 ## 🔧 Advanced Configuration
 
-### Python Algorithm Customization
+### Serverless Algorithm Customization
 
-Edit `netlify/functions/smart-settlement.py` to:
+Edit `api/smart-settlement.js` to:
 - Add new settlement algorithms
 - Integrate external optimization libraries
 - Customize efficiency calculations
@@ -162,16 +155,6 @@ The schema includes tables for future features:
 - **Recurring Expenses**: Automated recurring bill handling
 - **Notifications**: Real-time user notifications
 - **Audit Log**: Complete change tracking
-
-### Feature Flags
-
-Control features via environment variables:
-```bash
-ENABLE_PYTHON_ALGORITHMS=true     # Use advanced Python algorithms
-ENABLE_ANALYTICS=false            # Future: Usage analytics
-ENABLE_NOTIFICATIONS=false        # Future: Push notifications
-ENABLE_CATEGORIES=false           # Future: Expense categorization
-```
 
 ## 📊 Monitoring & Analytics
 
@@ -220,14 +203,14 @@ ENABLE_CATEGORIES=false           # Future: Expense categorization
 ### Common Issues
 
 **❌ Environment Variables Not Loading**
-- Verify exact variable names in Netlify settings
+- Verify exact variable names in Vercel settings
 - Check for typos in Supabase URL/key
 - Ensure no trailing spaces in values
 
-**❌ Python Functions Not Working**
-- Check Netlify Functions log for errors
-- Verify `netlify/functions/` folder structure
-- Test with simple test payload first
+**❌ Advanced Settlement API Not Working**
+- Check Vercel deployment logs for `/api/smart-settlement`
+- Verify the `api/` folder contains both `get-config.js` and `smart-settlement.js`
+- Test with the sample payload shown above
 
 **❌ Database Connection Errors**
 - Verify Supabase project is active
@@ -254,8 +237,8 @@ ENABLE_CATEGORIES=false           # Future: Expense categorization
 ### Security Hardening
 
 **Production Checklist**:
-- ✅ Environment variables in Netlify (never in code)
-- ✅ HTTPS enforced via Netlify
+- ✅ Environment variables in Vercel (never in code)
+- ✅ HTTPS enforced via Vercel
 - ✅ Security headers configured
 - ✅ RLS policies active
 - ✅ Input validation implemented
@@ -263,8 +246,8 @@ ENABLE_CATEGORIES=false           # Future: Expense categorization
 ## 📞 Support Resources
 
 - **Database Issues**: Supabase Dashboard → Logs
-- **Function Issues**: Netlify Dashboard → Functions Log
+- **Function Issues**: Vercel Deployments → View Function Logs
 - **Frontend Issues**: Browser Console (F12)
-- **Performance**: Netlify Analytics Dashboard
+- **Performance**: Vercel Analytics Dashboard
 
 The application is production-ready with enterprise-grade features, security, and scalability built-in from day one!

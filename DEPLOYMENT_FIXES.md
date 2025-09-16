@@ -14,20 +14,15 @@
 ```
 
 ### **Issue #2: Environment Variables**
-**Error:** Supabase configuration missing  
-**Fix:** Hardcoded your credentials (anon keys are meant to be public):
-```javascript
-// Your working configuration is now directly in the code
-const SUPABASE_URL = 'https://mxgjpomavvdklqfbbsxh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-```
+**Error:** Supabase configuration missing
+**Fix:** Added a secure Vercel serverless config endpoint (`/api/get-config`) that reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` from environment variables.
 
 ### **Issue #3: Password Form Warnings**
 **Error:** DOM warnings about password fields  
 **Fix:** Wrapped inputs in proper `<form>` tags with submit handlers
 
-### **Issue #4: Python Function Endpoint**
-**Fix:** Updated API endpoint to correct Netlify Functions path
+### **Issue #4: Settlement API Endpoint**
+**Fix:** Added `/api/smart-settlement` for Vercel to power the advanced settlement engine
 
 ## 📁 File Structure
 
@@ -35,25 +30,24 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 roomledger/
 ├── index.html                    ← Updated with fixes
 ├── styles.css                    ← Professional styling  
-├── netlify.toml                  ← Fixed functions config
-├── netlify/functions/
-│   ├── smart-settlement.py       ← Python algorithms
-│   └── requirements.txt          ← Dependencies
+├── api/
+│   ├── get-config.js             ← Vercel environment bridge
+│   └── smart-settlement.js       ← Advanced settlement engine
 └── DEPLOYMENT_FIXES.md           ← This guide
 ```
 
 ## 🚀 Deploy Instructions
 
-1. **Replace YOUR_ACTUAL_KEY_HERE** in `index.html` with your complete Supabase anon key
-2. **Commit and push** to GitHub
-3. **Netlify will auto-deploy** with all fixes
+1. **Set `SUPABASE_URL` and `SUPABASE_ANON_KEY`** in Vercel Project Settings → Environment Variables
+2. **Commit and push** to GitHub (or trigger a redeploy from the Vercel dashboard)
+3. Vercel will build with the correct credentials baked into the serverless config endpoints
 
 ## 🎯 What's Working Now
 
 ✅ **Supabase CDN** - Latest official version  
-✅ **Environment Variables** - Hardcoded credentials  
-✅ **Password Forms** - No more browser warnings  
-✅ **API Endpoints** - Correct Netlify Functions paths  
-✅ **CSP Headers** - Updated for new CDN  
+✅ **Environment Variables** - Loaded securely from Vercel
+✅ **Password Forms** - No more browser warnings
+✅ **API Endpoints** - `/api/get-config` and `/api/smart-settlement` available
+✅ **CSP Headers** - Updated for new CDN
 
 Your RoomLedger app should now work perfectly! 🎉 

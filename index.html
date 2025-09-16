@@ -84,16 +84,22 @@
                     <div class="setup-step">
                         <div class="step-header">
                             <div class="step-number">1</div>
-                            <div class="step-title">👤 Your Information</div>
+                            <div class="step-title">🛠️ Group Setup</div>
                         </div>
-                        <p class="step-description">Set up your admin account for the group</p>
-                        
+                        <p class="step-description">Name your room, create the admin account, and choose the default currency</p>
+
+                        <div class="form-group">
+                            <label>Group Name</label>
+                            <input type="text" id="groupName" placeholder="e.g., Room 101 or Karachi Apartment">
+                            <small class="form-hint">This name helps everyone recognize the shared space</small>
+                        </div>
+
                         <div class="form-group">
                             <label>Your Name (Group Admin)</label>
                             <input type="text" id="adminName" placeholder="Enter your full name">
                             <small class="form-hint">This will be your display name in the group</small>
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Group Password</label>
                             <form onsubmit="event.preventDefault(); createGroup();">
@@ -103,6 +109,22 @@
                                 <span style="color: var(--apple-orange);">🔒</span>
                                 This password will be shared with all group members
                             </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Default Currency</label>
+                            <select id="groupCurrency">
+                                <option value="PKR" selected>PKR — Pakistani Rupee</option>
+                                <option value="USD">USD — US Dollar</option>
+                                <option value="EUR">EUR — Euro</option>
+                                <option value="GBP">GBP — British Pound</option>
+                                <option value="AED">AED — UAE Dirham</option>
+                                <option value="INR">INR — Indian Rupee</option>
+                                <option value="AUD">AUD — Australian Dollar</option>
+                                <option value="CAD">CAD — Canadian Dollar</option>
+                                <option value="SAR">SAR — Saudi Riyal</option>
+                            </select>
+                            <small class="form-hint">You can update this later from the group settings</small>
                         </div>
                     </div>
                 
@@ -337,10 +359,10 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Amount (PKR)</label>
+                            <label>Amount (<span id="amountCurrencyLabel">PKR</span>)</label>
                             <div class="amount-input">
                                 <input type="number" id="debtAmount" placeholder="Enter amount" step="0.01" min="0">
-                                <div class="currency-symbol">PKR</div>
+                                <div class="currency-symbol" id="amountCurrencySymbol">PKR</div>
                             </div>
                             <small class="form-hint">Total amount that was paid</small>
                         </div>
@@ -430,7 +452,47 @@
                         </div>
                         <div class="card-subtitle">Add new members and manage existing ones</div>
                     </div>
-                    
+
+                    <!-- Group Settings Section -->
+                    <div class="manage-section">
+                        <div class="section-header">
+                            <div class="section-icon">⚙️</div>
+                            <div class="section-title">Group Settings</div>
+                        </div>
+                        <p class="section-description">Update the shared room name and default currency for this group</p>
+
+                        <div id="groupSettingsAdminNote" class="info hidden">Only group admins can update these settings.</div>
+
+                        <div class="form-group">
+                            <label>Group Name</label>
+                            <input type="text" id="groupNameInput" placeholder="e.g., Room 101 or Beach Apartment">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Default Currency</label>
+                            <select id="groupCurrencySelect">
+                                <option value="PKR" selected>PKR — Pakistani Rupee</option>
+                                <option value="USD">USD — US Dollar</option>
+                                <option value="EUR">EUR — Euro</option>
+                                <option value="GBP">GBP — British Pound</option>
+                                <option value="AED">AED — UAE Dirham</option>
+                                <option value="INR">INR — Indian Rupee</option>
+                                <option value="AUD">AUD — Australian Dollar</option>
+                                <option value="CAD">CAD — Canadian Dollar</option>
+                                <option value="SAR">SAR — Saudi Riyal</option>
+                            </select>
+                            <small class="form-hint">All totals and settlements will use this currency</small>
+                        </div>
+
+                        <button class="btn btn-primary" id="saveGroupSettingsBtn" onclick="saveGroupSettings()">
+                            <span>💾</span>
+                            Save Settings
+                        </button>
+
+                        <div id="settingsError" class="message error"></div>
+                        <div id="settingsSuccess" class="message success"></div>
+                    </div>
+
                     <!-- Add New Member Section -->
                     <div class="manage-section">
                         <div class="section-header">
@@ -477,30 +539,41 @@
         let SUPABASE_URL = null;
         let SUPABASE_ANON_KEY = null;
         
-        // Load Supabase credentials securely from server
+        // Load Supabase credentials securely from Vercel serverless function
         async function loadSupabaseConfig() {
+            const loginErrorDiv = document.getElementById('loginError');
+            const registerErrorDiv = document.getElementById('registerError');
+
             try {
-                const response = await fetch('/.netlify/functions/get-config');
-                if (response.ok) {
-                    const config = await response.json();
-                    SUPABASE_URL = config.supabaseUrl;
-                    SUPABASE_ANON_KEY = config.supabaseAnonKey;
-                    
-                    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-                        throw new Error('Supabase credentials not found in environment variables');
-                    }
-                    
-                    // Initialize Supabase client
-                    initializeSupabase();
-                } else {
-                    throw new Error('Failed to load configuration');
+                const response = await fetch('/api/get-config', { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`/api/get-config responded with status ${response.status}`);
+                }
+
+                const config = await response.json();
+                SUPABASE_URL = config.supabaseUrl;
+                SUPABASE_ANON_KEY = config.supabaseAnonKey;
+
+                if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                    throw new Error('Supabase credentials missing from environment variables');
+                }
+
+                initializeSupabase();
+
+                if (loginErrorDiv) {
+                    loginErrorDiv.textContent = '';
+                }
+                if (registerErrorDiv) {
+                    registerErrorDiv.textContent = '';
                 }
             } catch (error) {
-                console.error('⚠️ Failed to load Supabase configuration:', error.message);
-                if (error.message.includes('Unexpected token')) {
-                    console.error('The serverless function is not found. Please check your Netlify deployment.');
-                } else {
-                    console.error('Please set SUPABASE_URL and SUPABASE_ANON_KEY environment variables in Netlify');
+                console.error('⚠️ Failed to load Supabase configuration.', error);
+
+                if (loginErrorDiv) {
+                    loginErrorDiv.textContent = 'Unable to load Supabase credentials. Confirm SUPABASE_URL and SUPABASE_ANON_KEY are set in your Vercel project settings, then redeploy.';
+                }
+                if (registerErrorDiv) {
+                    registerErrorDiv.textContent = 'Unable to load Supabase credentials. Confirm SUPABASE_URL and SUPABASE_ANON_KEY are set in your Vercel project settings, then redeploy.';
                 }
             }
         }
@@ -534,6 +607,91 @@
         let groupMembers = [];
         let pendingMembers = [];
         let currentSettlement = null;
+
+        const DEFAULT_CURRENCY = 'PKR';
+
+        function getCurrentCurrency() {
+            if (currentGroup && currentGroup.currency) {
+                return currentGroup.currency;
+            }
+            return DEFAULT_CURRENCY;
+        }
+
+        function formatCurrency(amount, currencyOverride) {
+            const value = Number.isFinite(amount) ? amount : parseFloat(amount);
+            const safeValue = Number.isFinite(value) ? value : 0;
+            const currency = currencyOverride || getCurrentCurrency();
+
+            try {
+                return new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency,
+                    currencyDisplay: 'symbol',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(safeValue);
+            } catch (error) {
+                return `${currency} ${safeValue.toFixed(2)}`;
+            }
+        }
+
+        function getCurrencySymbol(currencyOverride) {
+            const currency = currencyOverride || getCurrentCurrency();
+
+            try {
+                const formatted = new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency,
+                    currencyDisplay: 'narrowSymbol',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(0);
+
+                const symbol = formatted.replace(/[\d\s.,]/g, '').trim();
+                return symbol || currency;
+            } catch (error) {
+                return currency;
+            }
+        }
+
+        function updateCurrencyDisplay() {
+            const currencyCode = getCurrentCurrency();
+            const currencySymbol = getCurrencySymbol(currencyCode);
+
+            const label = document.getElementById('amountCurrencyLabel');
+            if (label) {
+                label.textContent = currencyCode;
+            }
+
+            const symbolElement = document.getElementById('amountCurrencySymbol');
+            if (symbolElement) {
+                symbolElement.textContent = currencySymbol;
+            }
+
+            const totalExpensesElement = document.getElementById('totalExpenses');
+            if (totalExpensesElement) {
+                if (typeof totalExpensesElement.dataset.value === 'undefined') {
+                    totalExpensesElement.dataset.value = 0;
+                }
+                const rawValue = parseFloat(totalExpensesElement.dataset.value || 0);
+                totalExpensesElement.textContent = formatCurrency(rawValue, currencyCode);
+            }
+
+            const totalDebtElement = document.getElementById('totalDebtAmount');
+            if (totalDebtElement) {
+                if (typeof totalDebtElement.dataset.value === 'undefined') {
+                    totalDebtElement.dataset.value = 0;
+                }
+                const rawDebt = parseFloat(totalDebtElement.dataset.value || 0);
+                totalDebtElement.textContent = formatCurrency(rawDebt, currencyCode);
+            }
+
+            const subtitle = document.querySelector('.app-subtitle');
+            if (subtitle) {
+                const groupName = currentGroup && currentGroup.name ? currentGroup.name : 'Shared expenses';
+                subtitle.textContent = `${groupName} • Currency: ${currencyCode}`;
+            }
+        }
 
         // Auth functions
         function showAuthTab(tab) {
@@ -610,8 +768,14 @@
         function updateMemberCount() {
             const totalMembers = pendingMembers.length + 1; // +1 for admin
             const countDisplay = document.querySelector('.member-count');
+            const labelDisplay = document.querySelector('.counter-label');
+
             if (countDisplay) {
-                countDisplay.textContent = `${totalMembers} member${totalMembers !== 1 ? 's' : ''}`;
+                countDisplay.textContent = totalMembers;
+            }
+
+            if (labelDisplay) {
+                labelDisplay.textContent = totalMembers === 1 ? 'member' : 'members';
             }
         }
 
@@ -622,21 +786,30 @@
 
         function updateMembersList() {
             const membersList = document.getElementById('membersList');
-            membersList.innerHTML = pendingMembers.map(member => 
+            membersList.innerHTML = pendingMembers.map(member =>
                 `<div class="member-chip">
                     ${member}
                     <button class="remove-member" onclick="removeMember('${member}')">×</button>
                 </div>`
             ).join('');
+
+            updateMemberCount();
         }
 
         async function createGroup() {
+            const groupName = document.getElementById('groupName').value.trim();
             const adminName = document.getElementById('adminName').value.trim();
             const password = document.getElementById('groupPassword').value.trim();
+            const currency = document.getElementById('groupCurrency').value;
             const errorDiv = document.getElementById('registerError');
 
-            if (!adminName || !password) {
+            if (!groupName || !adminName || !password) {
                 errorDiv.textContent = 'Please fill in all fields';
+                return;
+            }
+
+            if (groupName.length < 2) {
+                errorDiv.textContent = 'Group name must be at least 2 characters long';
                 return;
             }
 
@@ -653,7 +826,7 @@
                 // Create group
                 const { data: groupData, error: groupError } = await supabase
                     .from('groups')
-                    .insert([{ password: password }])
+                    .insert([{ name: groupName, password: password, currency: currency }])
                     .select();
 
                 if (groupError) throw groupError;
@@ -679,8 +852,10 @@
                 showAuthTab('login');
                 
                 // Clear form
+                document.getElementById('groupName').value = '';
                 document.getElementById('adminName').value = '';
                 document.getElementById('groupPassword').value = '';
+                document.getElementById('groupCurrency').value = 'PKR';
                 pendingMembers = [];
                 updateMembersList();
 
@@ -760,9 +935,10 @@
         function showApp() {
             document.getElementById('authSection').classList.add('hidden');
             document.getElementById('appSection').classList.remove('hidden');
-            
+
             document.getElementById('welcomeMessage').textContent = `Welcome, ${currentUser.username}!`;
-            
+
+            updateCurrencyDisplay();
             updateDropdowns();
             loadDashboard();
             loadCurrentBalances();
@@ -836,7 +1012,11 @@
                 if (expensesError) throw expensesError;
                 
                 const totalExpenses = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-                document.getElementById('totalExpenses').textContent = `PKR ${totalExpenses.toFixed(2)}`;
+                const totalExpensesElement = document.getElementById('totalExpenses');
+                if (totalExpensesElement) {
+                    totalExpensesElement.dataset.value = totalExpenses;
+                    totalExpensesElement.textContent = formatCurrency(totalExpenses);
+                }
                 
                 // Get member count
                 document.getElementById('memberCount').textContent = groupMembers.length;
@@ -901,10 +1081,12 @@
                 balances.slice(0, 3).forEach(balance => {
                     const balanceItem = document.createElement('div');
                     balanceItem.className = 'debt-item';
+                    const formattedAmount = formatCurrency(balance.amount);
+                    const displayAmount = balance.amount > 0 ? `+${formattedAmount}` : formattedAmount;
                     balanceItem.innerHTML = `
                         <div class="debt-name">${balance.name}</div>
                         <div class="debt-amount ${balance.amount >= 0 ? 'positive' : 'negative'}">
-                            ${balance.amount >= 0 ? '+' : ''}PKR ${balance.amount.toFixed(2)}
+                            ${displayAmount}
                         </div>
                     `;
                     balancesPreview.appendChild(balanceItem);
@@ -1025,11 +1207,9 @@
                 document.getElementById('debtDescription').value = '';
                 document.getElementById('debtAmount').value = '';
                 
-                // Refresh balances if on settle tab
-                const settleTab = document.getElementById('settleTab');
-                if (settleTab.classList.contains('active')) {
-                    loadCurrentBalances();
-                }
+                // Refresh views so dashboards stay in sync
+                loadDashboard();
+                loadCurrentBalances();
 
             } catch (error) {
                 errorDiv.textContent = 'Error adding expense: ' + error.message;
@@ -1041,7 +1221,7 @@
                 if (!supabase) {
                     throw new Error('Supabase client not initialized');
                 }
-                
+
                 const { data: transactions, error } = await supabase
                     .from('transactions')
                     .select(`
@@ -1054,7 +1234,6 @@
 
                 if (error) throw error;
 
-                // Calculate net balances
                 const balances = {};
                 groupMembers.forEach(member => {
                     balances[member.id] = { name: member.username, balance: 0 };
@@ -1065,45 +1244,48 @@
                     balances[transaction.to_member_id].balance += transaction.amount;
                 });
 
-                                   // Display enhanced balances
-                   const balancesDiv = document.getElementById('currentBalances');
-                   const totalDebtAmount = document.getElementById('totalDebtAmount');
-                   
-                   const balanceItems = Object.values(balances)
-                       .filter(person => Math.abs(person.balance) > 0.01)
-                       .map(person => {
-                           const isPositive = person.balance > 0;
-                           const status = isPositive ? 'owed-to' : 'owed';
-                           const text = isPositive ? 'is owed' : 'owes';
-                           return `<div class="debt-item">
-                               <div class="debt-item-header">
-                                   <div class="debt-person">${person.name}</div>
-                                   <div class="debt-status ${status}">${text}</div>
-                               </div>
-                               <div class="debt-amount ${isPositive ? 'positive' : 'negative'}">
-                                   PKR ${Math.abs(person.balance).toFixed(2)}
-                               </div>
-                           </div>`;
-                       });
-   
-                   // Calculate total debt amount
-                   const totalAmount = Object.values(balances)
-                       .filter(person => person.balance < 0)
-                       .reduce((sum, person) => sum + Math.abs(person.balance), 0);
-                   
-                   totalDebtAmount.textContent = `PKR ${totalAmount.toFixed(2)}`;
-   
-                                       if (balanceItems.length === 0) {
+                const balancesDiv = document.getElementById('currentBalances');
+                const totalDebtAmountElement = document.getElementById('totalDebtAmount');
+
+                const balanceItems = Object.values(balances)
+                    .filter(person => Math.abs(person.balance) > 0.01)
+                    .map(person => {
+                        const isPositive = person.balance > 0;
+                        const status = isPositive ? 'owed-to' : 'owed';
+                        const text = isPositive ? 'is owed' : 'owes';
+                        const amountDisplay = formatCurrency(Math.abs(person.balance));
+                        return `<div class="debt-item">
+                            <div class="debt-item-header">
+                                <div class="debt-person">${person.name}</div>
+                                <div class="debt-status ${status}">${text}</div>
+                            </div>
+                            <div class="debt-amount ${isPositive ? 'positive' : 'negative'}">
+                                ${amountDisplay}
+                            </div>
+                        </div>`;
+                    });
+
+                const totalAmount = Object.values(balances)
+                    .filter(person => person.balance < 0)
+                    .reduce((sum, person) => sum + Math.abs(person.balance), 0);
+
+                if (totalDebtAmountElement) {
+                    totalDebtAmountElement.dataset.value = totalAmount;
+                    totalDebtAmountElement.textContent = formatCurrency(totalAmount);
+                }
+
+                if (balancesDiv) {
+                    if (balanceItems.length === 0) {
                         balancesDiv.innerHTML = '<div class="debt-item" style="text-align: center; padding: var(--space-8);"><div style="font-size: 3rem; margin-bottom: var(--space-4);">✅</div><div style="font-weight: 600; color: var(--apple-green);">Everyone is settled up!</div><div style="color: var(--label-secondary); margin-top: var(--space-2);">No outstanding debts</div></div>';
                     } else {
                         balancesDiv.innerHTML = balanceItems.join('');
                     }
+                }
 
             } catch (error) {
                 console.error('Error loading balances:', error);
             }
         }
-
         async function calculateSettlement() {
             try {
                 if (!supabase) {
@@ -1129,7 +1311,7 @@
                     balances[transaction.to_member_id] += transaction.amount;
                 });
 
-                // Try to use Python API for advanced settlement calculation
+                // Try to use Vercel serverless API for advanced settlement calculation
                 try {
                     const response = await fetch('/api/smart-settlement', {
                         method: 'POST',
@@ -1149,7 +1331,7 @@
                         return;
                     }
                 } catch (apiError) {
-                    console.log('Python API unavailable, using JavaScript fallback');
+                    console.log('Advanced settlement API unavailable, using JavaScript fallback');
                 }
 
                 // Fallback to JavaScript algorithm
@@ -1234,11 +1416,12 @@
                 }
 
                 const totalAmount = settlements.reduce((sum, s) => sum + s.amount, 0);
+                const totalAmountDisplay = formatCurrency(totalAmount);
                 const settlementHtml = `
                     <div class="settlement-card">
                         <div class="settlement-header">
                             <div class="settlement-title">🧮 Smart Settlement Calculated!</div>
-                            <div class="settlement-amount">PKR ${totalAmount.toFixed(2)}</div>
+                            <div class="settlement-amount">${totalAmountDisplay}</div>
                         </div>
                         <div style="color: var(--label-secondary); margin-bottom: var(--space-4);">
                             Follow these steps to settle up with minimum transactions:
@@ -1252,7 +1435,7 @@
                                         <span class="step-from">${s.fromName}</span>
                                         <span> pays </span>
                                         <span class="step-to">${s.toName}</span>
-                                        <span class="step-amount"> PKR ${s.amount.toFixed(2)}</span>
+                                        <span class="step-amount">${formatCurrency(s.amount)}</span>
                                     </div>
                                 </div>
                             `).join('')}
@@ -1326,8 +1509,8 @@
 
                 const historyHtml = settlements.map(settlement => {
                     const date = new Date(settlement.created_at).toLocaleString();
-                    const settlementsHtml = settlement.settlement_data.map(s => 
-                        `<div style="margin: 4px 0;"><strong>${s.fromName}</strong> → <strong>${s.toName}</strong>: PKR ${s.amount.toFixed(2)}</div>`
+                    const settlementsHtml = settlement.settlement_data.map(s =>
+                        `<div style="margin: 4px 0;"><strong>${s.fromName}</strong> → <strong>${s.toName}</strong>: ${formatCurrency(s.amount)}</div>`
                     ).join('');
                     
                     return `<div class="history-item">
@@ -1343,9 +1526,46 @@
             }
         }
 
+        function populateGroupSettings() {
+            const nameInput = document.getElementById('groupNameInput');
+            const currencySelect = document.getElementById('groupCurrencySelect');
+            const adminNote = document.getElementById('groupSettingsAdminNote');
+            const saveButton = document.getElementById('saveGroupSettingsBtn');
+
+            if (!nameInput || !currencySelect) {
+                return;
+            }
+
+            const currentCurrency = getCurrentCurrency();
+
+            nameInput.value = currentGroup && currentGroup.name ? currentGroup.name : '';
+
+            const hasCurrencyOption = Array.from(currencySelect.options).some(option => option.value === currentCurrency);
+            if (!hasCurrencyOption) {
+                const option = document.createElement('option');
+                option.value = currentCurrency;
+                option.textContent = `${currentCurrency}`;
+                currencySelect.appendChild(option);
+            }
+            currencySelect.value = currentCurrency;
+
+            const isAdmin = currentUser && currentUser.is_admin;
+            nameInput.disabled = !isAdmin;
+            currencySelect.disabled = !isAdmin;
+
+            if (saveButton) {
+                saveButton.disabled = !isAdmin;
+            }
+
+            if (adminNote) {
+                adminNote.classList.toggle('hidden', !!isAdmin);
+            }
+        }
+
         function updateManageTab() {
+            populateGroupSettings();
             const currentMembersDiv = document.getElementById('currentMembers');
-            
+
             if (groupMembers.length === 0) {
                 currentMembersDiv.innerHTML = `
                     <div style="text-align: center; padding: var(--space-8); color: var(--gray-500);">
@@ -1381,6 +1601,62 @@
             }).join('');
 
             currentMembersDiv.innerHTML = membersHtml;
+        }
+
+        async function saveGroupSettings() {
+            const errorDiv = document.getElementById('settingsError');
+            const successDiv = document.getElementById('settingsSuccess');
+            const nameInput = document.getElementById('groupNameInput');
+            const currencySelect = document.getElementById('groupCurrencySelect');
+
+            if (!nameInput || !currencySelect) {
+                return;
+            }
+
+            errorDiv.textContent = '';
+            successDiv.textContent = '';
+
+            if (!currentUser || !currentUser.is_admin) {
+                errorDiv.textContent = 'Only admins can update group settings.';
+                return;
+            }
+
+            const groupName = nameInput.value.trim();
+            const currency = currencySelect.value;
+
+            if (groupName.length < 2) {
+                errorDiv.textContent = 'Group name must be at least 2 characters long.';
+                return;
+            }
+
+            try {
+                const { data: updatedGroup, error } = await supabase
+                    .from('groups')
+                    .update({
+                        name: groupName,
+                        currency: currency
+                    })
+                    .eq('id', currentGroup.id)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                currentGroup = { ...currentGroup, ...updatedGroup };
+
+                successDiv.textContent = 'Group settings updated successfully!';
+                populateGroupSettings();
+                updateCurrencyDisplay();
+                loadDashboard();
+                loadCurrentBalances();
+                loadHistory();
+
+                setTimeout(() => {
+                    successDiv.textContent = '';
+                }, 3000);
+            } catch (error) {
+                errorDiv.textContent = 'Error updating settings: ' + error.message;
+            }
         }
 
         async function addNewMember() {

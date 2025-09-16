@@ -974,6 +974,12 @@
             console.log('showApp() called');
             
             try {
+                // Hide landing header
+                const header = document.querySelector('.header');
+                if (header) {
+                    header.style.display = 'none';
+                }
+
                 // Hide auth section and show app section
                 const authSection = document.getElementById('authSection');
                 const appSection = document.getElementById('appSection');
@@ -1031,6 +1037,11 @@
                     appCard.style.display = 'block';
                     appCard.style.visibility = 'visible';
                     appCard.style.opacity = '1';
+                }
+
+                // Scroll into view so user immediately sees the app
+                if (appSection) {
+                    appSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
 
                 // Initialize all app components

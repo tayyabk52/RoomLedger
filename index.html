@@ -974,6 +974,20 @@
             console.log('showApp() called');
             
             try {
+                // Inject runtime CSS override to guarantee visibility
+                const existingOverride = document.getElementById('app-visibility-override');
+                if (!existingOverride) {
+                    const style = document.createElement('style');
+                    style.id = 'app-visibility-override';
+                    style.textContent = `
+                        #appSection { display: block !important; visibility: visible !important; opacity: 1 !important; }
+                        #appSection .card { display: block !important; visibility: visible !important; opacity: 1 !important; }
+                        #appSection .tab-content { display: none; }
+                        #appSection .tab-content.active { display: block !important; }
+                    `;
+                    document.head.appendChild(style);
+                }
+
                 // Hide landing header
                 const header = document.querySelector('.header');
                 if (header) {

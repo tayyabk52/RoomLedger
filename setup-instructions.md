@@ -104,6 +104,7 @@ POST https://your-app.netlify.app/.netlify/functions/smart-settlement
 
 1. **Create Test Group**:
    - Register with your name + family members
+   - Give the room a friendly **Group Name** and choose the **Default Currency**
    - Use strong group password
    - Test login with different usernames
 

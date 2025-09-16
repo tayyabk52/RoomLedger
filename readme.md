@@ -12,6 +12,7 @@ RoomLedger is a lightweight, mobile-friendly web app that helps families, roomma
 - **Settlement History**: Track all past settlements
 - **Flexible Expense Splitting**: Split bills between selected group members
 - **Real-time Balances**: See who owes what instantly
+- **Room Preferences**: Name your room and pick the currency that fits your household
 
 ## 📱 Example Scenario
 
@@ -48,11 +49,11 @@ After setup, your app will be available at your Netlify URL (like `https://your-
 
 ## 🎯 How It Works
 
-1. **Create Group**: One person registers and adds family/roommate names
+1. **Create Group**: One person registers, names the shared room, chooses a currency, and adds family/roommate names
 2. **Shared Access**: Everyone uses the same group password to login
 3. **Track Expenses**: Anyone can add expenses and split them
 4. **Smart Settlement**: App calculates the minimum payments needed
-5. **Record & Repeat**: Confirm settlements and maintain history
+5. **Record & Repeat**: Confirm settlements, tweak settings anytime, and maintain history
 
 ## 🔧 Tech Stack
 

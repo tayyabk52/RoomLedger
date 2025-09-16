@@ -14,13 +14,8 @@
 ```
 
 ### **Issue #2: Environment Variables**
-**Error:** Supabase configuration missing  
-**Fix:** Hardcoded your credentials (anon keys are meant to be public):
-```javascript
-// Your working configuration is now directly in the code
-const SUPABASE_URL = 'https://mxgjpomavvdklqfbbsxh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-```
+**Error:** Supabase configuration missing
+**Fix:** Added secure serverless config endpoints for both Netlify (`/.netlify/functions/get-config`) and Vercel (`/api/get-config`) that read `SUPABASE_URL` and `SUPABASE_ANON_KEY` from hosting environment variables.
 
 ### **Issue #3: Password Form Warnings**
 **Error:** DOM warnings about password fields  
@@ -36,7 +31,9 @@ roomledger/
 ├── index.html                    ← Updated with fixes
 ├── styles.css                    ← Professional styling  
 ├── netlify.toml                  ← Fixed functions config
+├── api/get-config.js             ← Vercel environment bridge
 ├── netlify/functions/
+│   ├── get-config.js             ← Netlify environment bridge
 │   ├── smart-settlement.py       ← Python algorithms
 │   └── requirements.txt          ← Dependencies
 └── DEPLOYMENT_FIXES.md           ← This guide
@@ -44,16 +41,16 @@ roomledger/
 
 ## 🚀 Deploy Instructions
 
-1. **Replace YOUR_ACTUAL_KEY_HERE** in `index.html` with your complete Supabase anon key
-2. **Commit and push** to GitHub
-3. **Netlify will auto-deploy** with all fixes
+1. **Set `SUPABASE_URL` and `SUPABASE_ANON_KEY`** in your hosting provider (Vercel → Project Settings → Environment Variables, Netlify → Site Settings → Environment)
+2. **Commit and push** to GitHub (or trigger a redeploy from your hosting dashboard)
+3. Your chosen platform will build with the correct credentials baked into the serverless config endpoint
 
 ## 🎯 What's Working Now
 
 ✅ **Supabase CDN** - Latest official version  
-✅ **Environment Variables** - Hardcoded credentials  
-✅ **Password Forms** - No more browser warnings  
-✅ **API Endpoints** - Correct Netlify Functions paths  
+✅ **Environment Variables** - Loaded securely from Netlify/Vercel
+✅ **Password Forms** - No more browser warnings
+✅ **API Endpoints** - Correct Netlify/Vercel function paths
 ✅ **CSP Headers** - Updated for new CDN  
 
 Your RoomLedger app should now work perfectly! 🎉 

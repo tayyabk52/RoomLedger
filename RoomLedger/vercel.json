@@ -1,0 +1,13 @@
+{
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_SUPABASE_URL": "@supabase-url",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase-anon-key"
+    }
+  },
+  "functions": {
+    "app/**": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
